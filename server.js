@@ -14,6 +14,7 @@ const PORT = process.env.PORT || 3001;
 
 app.use(cors());
 app.use(express.static(__dirname));
+app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'telecom-news.html')));
 
 // Agente HTTPS sem verificacao de cert (para Anatel/Fundamentus)
 const agentInsecure = new https.Agent({ rejectUnauthorized: false });
