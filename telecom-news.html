@@ -1,0 +1,878 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Telecom Signal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Manrope:wght@300;400;500;600;700&display=swap">
+<style>
+:root {
+  --bg:          #080B12;
+  --surface:     #0F1320;
+  --card:        #141826;
+  --border:      #1E2740;
+  --border-lite: #252E48;
+  --text:        #D8E2F5;
+  --muted:       #5A6A8A;
+  --subtle:      #8896B4;
+  --cyan:        #00C8E0;
+  --brisanet:    #F05424;
+  --brisanet-dim:rgba(240,84,36,.12);
+  --green:       #22C97A;
+  --red:         #F04F4F;
+  --yellow:      #F5C518;
+  --radius:      10px;
+  --radius-sm:   6px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:15px;scroll-behavior:smooth}
+body{font-family:'Manrope',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;line-height:1.6}
+a{color:inherit;text-decoration:none}
+
+/* Ticker */
+.ticker-wrap{background:var(--surface);border-bottom:1px solid var(--border);overflow:hidden;height:40px;display:flex;align-items:center;position:sticky;top:0;z-index:100}
+.ticker-label{flex-shrink:0;font-family:'Syne',sans-serif;font-size:.65rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--cyan);background:var(--bg);padding:0 16px;height:100%;display:flex;align-items:center;border-right:1px solid var(--border);white-space:nowrap}
+.ticker-track{display:flex;animation:ticker 36s linear infinite;white-space:nowrap}
+.ticker-track:hover{animation-play-state:paused}
+@keyframes ticker{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+.ticker-item{display:inline-flex;align-items:center;gap:8px;padding:0 24px;border-right:1px solid var(--border);font-size:.78rem;font-variant-numeric:tabular-nums;font-weight:500}
+.ticker-item .sym{font-family:'Syne',sans-serif;font-weight:700;font-size:.72rem;letter-spacing:.05em}
+.ticker-item .sym.brisanet{color:var(--brisanet)}
+.chg.up{color:var(--green)}.chg.dn{color:var(--red)}.chg.flat{color:var(--muted)}
+
+/* Header */
+header{padding:28px 40px 22px;display:flex;align-items:flex-end;justify-content:space-between;border-bottom:1px solid var(--border);gap:20px;flex-wrap:wrap}
+.brand-name{font-family:'Syne',sans-serif;font-size:1.7rem;font-weight:800;letter-spacing:-.02em;color:#fff}
+.brand-name span{color:var(--cyan)}
+.brand-sub{font-size:.7rem;font-weight:500;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-top:4px}
+.live-badge{display:inline-flex;align-items:center;gap:6px;font-size:.68rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--green);padding:4px 10px;background:rgba(34,201,122,.1);border:1px solid rgba(34,201,122,.25);border-radius:20px}
+.live-dot{width:6px;height:6px;background:var(--green);border-radius:50%;animation:pulse 1.8s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.8)}}
+.update-time{font-size:.7rem;color:var(--muted);margin-top:4px}
+
+/* Layout */
+.main{padding:32px 40px;max-width:1440px}
+.section-header{display:flex;align-items:center;gap:12px;margin-bottom:20px}
+.section-eyebrow{font-family:'Syne',sans-serif;font-size:.68rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.section-line{flex:1;height:1px;background:var(--border)}
+
+/* Brisanet hero */
+.brisanet-section{margin-bottom:40px;border:1px solid rgba(240,84,36,.3);border-radius:var(--radius);background:var(--card);overflow:hidden;position:relative}
+.brisanet-section::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--brisanet),#FF8C5A,var(--brisanet));background-size:200% 100%;animation:shimmer 3s linear infinite}
+@keyframes shimmer{0%{background-position:0% 0%}100%{background-position:200% 0%}}
+.brisanet-header{display:flex;align-items:center;gap:14px;padding:18px 24px 14px;border-bottom:1px solid rgba(240,84,36,.2);flex-wrap:wrap;gap:12px}
+.brisanet-logo{font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:800;color:var(--brisanet)}
+.brisanet-logo-tag{font-size:.63rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(240,84,36,.6);padding:2px 6px;border:1px solid rgba(240,84,36,.3);border-radius:4px}
+.brisanet-ticker-inline{margin-left:auto;display:flex;align-items:center;gap:10px;font-variant-numeric:tabular-nums}
+.brisanet-li-link{display:inline-flex;align-items:center;gap:5px;font-size:.68rem;font-weight:600;color:var(--muted);padding:4px 10px;border:1px solid var(--border);border-radius:4px;transition:border-color .2s,color .2s}
+.brisanet-li-link:hover{border-color:var(--cyan);color:var(--cyan)}
+.brisanet-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:1px;background:rgba(240,84,36,.1)}
+.brisanet-news-card{background:var(--card);padding:18px 22px;transition:background .2s;display:block;cursor:pointer}
+.brisanet-news-card:hover{background:rgba(240,84,36,.07)}
+.brisanet-news-card:hover .news-title{color:var(--brisanet)}
+
+/* Sector news */
+.sector-news-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:0;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:40px}
+.sector-news-card{padding:14px 20px;border-bottom:1px solid var(--border);border-right:1px solid var(--border);display:block;cursor:pointer;transition:background .15s}
+.sector-news-card:hover{background:var(--surface)}
+.sector-news-card:hover .news-title{color:var(--cyan)}
+
+/* Operators */
+.operators-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:20px;margin-bottom:40px}
+.operator-col{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.operator-col-header{padding:12px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.op-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.op-name{font-family:'Syne',sans-serif;font-size:.83rem;font-weight:700;letter-spacing:.02em}
+.op-count{margin-left:auto;font-size:.7rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.news-list{padding:4px 0}
+.news-card{padding:13px 18px;border-bottom:1px solid var(--border);display:block;cursor:pointer;transition:background .15s}
+.news-card:last-child{border-bottom:none}
+.news-card:hover{background:var(--bg)}
+.news-card:hover .news-title{color:var(--cyan)}
+
+/* News elements */
+.news-title{font-size:.845rem;font-weight:600;color:var(--text);line-height:1.4;margin-bottom:5px;transition:color .15s;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.news-meta{display:flex;align-items:center;gap:7px;font-size:.67rem;color:var(--muted)}
+.news-source{font-weight:700;letter-spacing:.04em;text-transform:uppercase;font-size:.61rem}
+.news-sep{width:3px;height:3px;background:var(--border-lite);border-radius:50%}
+
+/* B3 */
+.b3-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;margin-bottom:40px}
+.b3-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;position:relative;overflow:hidden;transition:border-color .2s}
+.b3-card.brisanet-card{border-color:rgba(240,84,36,.35)}
+.b3-card.brisanet-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:var(--brisanet)}
+.b3-card:hover{border-color:var(--border-lite)}
+.b3-sym{font-family:'Syne',sans-serif;font-size:.78rem;font-weight:800;letter-spacing:.06em;color:var(--subtle);margin-bottom:4px}
+.b3-card.brisanet-card .b3-sym{color:var(--brisanet)}
+.b3-company{font-size:.7rem;color:var(--muted);margin-bottom:12px;font-weight:500}
+.b3-price{font-family:'Syne',sans-serif;font-size:1.5rem;font-weight:700;color:#fff;font-variant-numeric:tabular-nums;letter-spacing:-.02em;line-height:1;margin-bottom:6px}
+.b3-change{display:inline-flex;align-items:center;gap:4px;font-size:.74rem;font-weight:600;font-variant-numeric:tabular-nums;padding:3px 8px;border-radius:4px}
+.b3-change.up{color:var(--green);background:rgba(34,201,122,.12)}
+.b3-change.dn{color:var(--red);background:rgba(240,79,79,.12)}
+.b3-change.flat{color:var(--muted);background:rgba(90,106,138,.12)}
+.b3-vol{font-size:.63rem;color:var(--muted);margin-top:7px;font-variant-numeric:tabular-nums}
+
+/* Ranking */
+.ranking-wrap{margin-bottom:40px}
+.rank-tabs{display:flex;gap:4px;margin-bottom:18px;background:var(--surface);padding:4px;border-radius:var(--radius);border:1px solid var(--border);width:fit-content}
+.rank-tab{font-family:'Syne',sans-serif;font-size:.7rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);background:none;border:none;cursor:pointer;padding:7px 14px;border-radius:7px;transition:background .15s,color .15s}
+.rank-tab.active{background:var(--card);color:var(--text);border:1px solid var(--border-lite)}
+.rank-panel{display:none}
+.rank-panel.active{display:block}
+.rank-note{font-size:.67rem;color:var(--muted);margin-bottom:14px}
+.rank-note a{color:var(--cyan);text-decoration:underline;text-underline-offset:2px}
+.rank-row{display:grid;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);grid-template-columns:28px 190px 1fr 100px 88px}
+.rank-row:last-child{border-bottom:none}
+.rank-row.header-row{padding:5px 0 8px;border-bottom:1px solid var(--border-lite)}
+.rank-label{font-family:'Syne',sans-serif;font-size:.6rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.rank-pos{font-family:'Syne',sans-serif;font-size:.75rem;font-weight:800;color:var(--muted);text-align:center}
+.rank-name{font-size:.85rem;font-weight:600;color:var(--text);display:flex;align-items:center;gap:8px}
+.rank-name-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.rank-name.br{color:var(--brisanet)}
+.rank-bar-wrap{position:relative;height:7px;background:var(--surface);border-radius:4px;overflow:hidden}
+.rank-bar{position:absolute;top:0;left:0;height:100%;border-radius:4px;transition:width .8s cubic-bezier(.22,1,.36,1)}
+.rank-subs{font-family:'Syne',sans-serif;font-size:.84rem;font-weight:700;color:var(--text);font-variant-numeric:tabular-nums;text-align:right}
+.rank-subs.br{color:var(--brisanet)}
+.rank-share{font-size:.71rem;color:var(--muted);font-variant-numeric:tabular-nums;text-align:right}
+.rank-brisanet-row{background:linear-gradient(90deg,var(--brisanet-dim),transparent);border-radius:var(--radius-sm);margin:0 -8px;padding-left:8px!important;padding-right:8px!important}
+.mvno-badge{font-size:.58rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 5px;border-radius:3px;background:rgba(240,84,36,.2);color:var(--brisanet);border:1px solid rgba(240,84,36,.3);margin-left:4px;white-space:nowrap}
+.total-strip{margin-top:14px;padding:11px 16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);display:flex;align-items:center;justify-content:space-between;font-size:.77rem}
+.total-strip strong{font-family:'Syne',sans-serif;font-size:1rem;font-weight:800;color:var(--cyan);font-variant-numeric:tabular-nums}
+
+/* Regional */
+.regional-wrap{margin-bottom:40px}
+.regions-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
+.region-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.region-header{padding:14px 18px 10px;display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+.region-name{font-family:'Syne',sans-serif;font-size:.88rem;font-weight:800;color:var(--text)}
+.region-states{font-size:.63rem;color:var(--muted);margin-top:2px;line-height:1.4}
+.region-leader{text-align:right;flex-shrink:0}
+.region-leader-label{font-size:.58rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.region-leader-name{font-family:'Syne',sans-serif;font-size:.78rem;font-weight:800}
+.region-bars{padding:0 18px 15px;display:flex;flex-direction:column;gap:7px}
+.region-bar-row{display:grid;grid-template-columns:108px 1fr 48px;align-items:center;gap:8px}
+.region-bar-label{font-size:.7rem;font-weight:600;color:var(--subtle);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.region-bar-label.br{color:var(--brisanet)}
+.region-bar-bg{height:6px;background:var(--surface);border-radius:3px;overflow:hidden}
+.region-bar-fill{height:100%;border-radius:3px;transition:width .8s cubic-bezier(.22,1,.36,1)}
+.region-bar-pct{font-size:.68rem;font-weight:700;color:var(--muted);text-align:right;font-variant-numeric:tabular-nums}
+.region-bar-pct.br{color:var(--brisanet)}
+.region-divider{height:1px;background:var(--border);margin:0 18px 11px}
+
+/* Sources */
+.sources-section{border-top:1px solid var(--border);padding-top:22px;margin-top:8px}
+.sources-list{display:flex;flex-wrap:wrap;gap:9px;margin-top:11px}
+.source-pill{display:inline-flex;align-items:center;gap:6px;font-size:.68rem;font-weight:600;letter-spacing:.05em;color:var(--subtle);background:var(--card);border:1px solid var(--border);padding:5px 12px;border-radius:20px;transition:border-color .2s,color .2s}
+.source-pill:hover{border-color:var(--cyan);color:var(--cyan)}
+.source-dot{width:5px;height:5px;border-radius:50%;background:var(--cyan)}
+
+/* States */
+.loading-card{padding:26px 20px;text-align:center;color:var(--muted);font-size:.78rem}
+.loading-card .spin{width:22px;height:22px;border:2px solid var(--border-lite);border-top-color:var(--cyan);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 10px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.error-card{padding:18px 20px;font-size:.76rem;color:var(--muted);text-align:center}
+.no-results{padding:20px;text-align:center;font-size:.78rem;color:var(--muted)}
+
+@media(max-width:768px){
+  header,.main{padding-left:18px;padding-right:18px}
+  .operators-grid{grid-template-columns:1fr}
+  .b3-grid{grid-template-columns:repeat(2,1fr)}
+  .rank-row{grid-template-columns:22px 1fr 60px 70px}
+  .rank-bar-wrap{display:none}
+}
+@media(prefers-reduced-motion:reduce){
+  .ticker-track,.brisanet-section::before,.live-dot{animation:none}
+}
+</style>
+</head>
+<body>
+
+<!-- Proxy offline banner -->
+<div id="proxyBanner" style="display:none;background:#1a0a00;border-bottom:1px solid rgba(240,84,36,.4);padding:9px 40px;align-items:center;gap:12px;font-size:.76rem;color:#F08050">
+  <span>&#9888;</span>
+  <span>Servidor proxy offline &mdash; execute o <strong style="color:#F05424">iniciar.bat</strong> e recarregue a pagina.</span>
+  <button onclick="location.reload()" style="margin-left:auto;background:rgba(240,84,36,.2);border:1px solid rgba(240,84,36,.4);color:#F05424;padding:4px 12px;border-radius:4px;cursor:pointer;font-size:.7rem;font-weight:700">Recarregar</button>
+</div>
+
+<!-- Ticker B3 -->
+<div class="ticker-wrap">
+  <div class="ticker-label">B3 &middot; TELECOM</div>
+  <div style="overflow:hidden;flex:1">
+    <div class="ticker-track">
+      <div class="ticker-item"><span class="sym brisanet">BRST3</span><span class="price" id="t-BRST3-p">&mdash;</span><span class="chg flat" id="t-BRST3-c">&mdash;</span></div>
+      <div class="ticker-item"><span class="sym">VIVT3</span><span class="price" id="t-VIVT3-p">&mdash;</span><span class="chg flat" id="t-VIVT3-c">&mdash;</span></div>
+      <div class="ticker-item"><span class="sym">TIMS3</span><span class="price" id="t-TIMS3-p">&mdash;</span><span class="chg flat" id="t-TIMS3-c">&mdash;</span></div>
+      <div class="ticker-item"><span class="sym">OIBR3</span><span class="price" id="t-OIBR3-p">&mdash;</span><span class="chg flat" id="t-OIBR3-c">&mdash;</span></div>
+      <div class="ticker-item"><span class="sym brisanet">BRST3</span><span class="price" id="t2-BRST3-p">&mdash;</span><span class="chg flat" id="t2-BRST3-c">&mdash;</span></div>
+      <div class="ticker-item"><span class="sym">VIVT3</span><span class="price" id="t2-VIVT3-p">&mdash;</span><span class="chg flat" id="t2-VIVT3-c">&mdash;</span></div>
+      <div class="ticker-item"><span class="sym">TIMS3</span><span class="price" id="t2-TIMS3-p">&mdash;</span><span class="chg flat" id="t2-TIMS3-c">&mdash;</span></div>
+      <div class="ticker-item"><span class="sym">OIBR3</span><span class="price" id="t2-OIBR3-p">&mdash;</span><span class="chg flat" id="t2-OIBR3-c">&mdash;</span></div>
+    </div>
+  </div>
+</div>
+
+<header>
+  <div>
+    <div class="brand-name">TELECOM<span>SIGNAL</span></div>
+    <div class="brand-sub">Painel de Noticias &amp; Mercado &middot; Brasil</div>
+  </div>
+  <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+    <span class="live-badge"><span class="live-dot"></span> Ao vivo</span>
+    <span class="update-time" id="updateTime">Carregando...</span>
+  </div>
+</header>
+
+<div class="main">
+
+  <!-- BRISANET & ROBERTO NOGUEIRA -->
+  <div class="section-header">
+    <span class="section-eyebrow">Brisanet &amp; Roberto Nogueira</span>
+    <div class="section-line"></div>
+  </div>
+
+  <div class="brisanet-section">
+    <div class="brisanet-header">
+      <div>
+        <span class="brisanet-logo">BRISANET</span>
+        <span class="brisanet-logo-tag">BRST3</span>
+      </div>
+      <a class="brisanet-li-link" href="https://www.linkedin.com/in/jose-roberto-nogueira/" target="_blank" rel="noopener">
+        in &nbsp;Roberto Nogueira
+      </a>
+      <a class="brisanet-li-link" href="https://www.linkedin.com/company/brisanettelecom/posts/?feedView=all" target="_blank" rel="noopener">
+        in &nbsp;Brisanet Telecom
+      </a>
+      <div class="brisanet-ticker-inline">
+        <span style="font-size:1.05rem;font-family:'Syne',sans-serif;font-weight:700;color:#fff" id="brst3-price-header">&mdash;</span>
+        <span class="b3-change flat" id="brst3-chg-header">&mdash;</span>
+      </div>
+    </div>
+    <div class="brisanet-grid" id="brisanetNews">
+      <div class="brisanet-news-card"><div class="loading-card"><div class="spin"></div>Buscando noticias...</div></div>
+    </div>
+  </div>
+
+  <!-- NOTICIAS DO SETOR -->
+  <div class="section-header" style="margin-top:40px">
+    <span class="section-eyebrow">Noticias do Setor Telecom</span>
+    <div class="section-line"></div>
+  </div>
+
+  <div class="sector-news-grid" id="sectorNews">
+    <div style="grid-column:1/-1"><div class="loading-card"><div class="spin"></div>Carregando...</div></div>
+  </div>
+
+  <!-- VAGAS REMOTAS BRISANET -->
+  <div class="section-header" style="margin-top:40px">
+    <span class="section-eyebrow">Vagas Remotas &mdash; Brisanet</span>
+    <div class="section-line"></div>
+  </div>
+
+  <div id="vagasWrap" style="background:var(--card);border:1px solid rgba(240,84,36,.25);border-radius:var(--radius);overflow:hidden;margin-bottom:40px;position:relative">
+    <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--brisanet),#FF8C5A)"></div>
+
+    <!-- cabecalho fixo -->
+    <div style="padding:18px 24px 14px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;border-bottom:1px solid rgba(240,84,36,.15)">
+      <div>
+        <div style="font-family:'Syne',sans-serif;font-size:.95rem;font-weight:800;color:#fff">Trabalhe na Brisanet &mdash; Home Office</div>
+        <div style="font-size:.67rem;color:var(--muted);margin-top:3px">
+          Fonte: LinkedIn Jobs &middot; atualizado em <span id="vagasData">&mdash;</span>
+        </div>
+      </div>
+      <div style="margin-left:auto;display:flex;gap:10px;flex-wrap:wrap">
+        <a href="https://www.linkedin.com/jobs/search-results/?currentJobId=4453421800&keywords=jobs&origin=JOB_SEARCH_PAGE_JOB_FILTER&referralSearchId=4078Gfeg%2BSF9OE3y7YoabQ%3D%3D&geoId=106057199&f_C=12980935&f_SAL=f_SA_id_225001%3A272001"
+           target="_blank" rel="noopener"
+           style="display:inline-flex;align-items:center;gap:6px;background:var(--brisanet);color:#fff;font-family:'Syne',sans-serif;font-size:.72rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:8px 16px;border-radius:6px">
+          Ver no LinkedIn &rarr;
+        </a>
+        <a href="https://www.linkedin.com/company/brisanettelecom/posts/?feedView=all"
+           target="_blank" rel="noopener"
+           style="display:inline-flex;align-items:center;gap:6px;background:none;border:1px solid rgba(240,84,36,.4);color:var(--brisanet);font-family:'Syne',sans-serif;font-size:.7rem;font-weight:700;padding:7px 14px;border-radius:6px">
+          in Brisanet Telecom
+        </a>
+      </div>
+    </div>
+
+    <!-- cards de vagas (carregados via /api/vagas) -->
+    <div id="vagasGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1px;background:rgba(240,84,36,.08)">
+      <div class="loading-card"><div class="spin"></div>Buscando vagas...</div>
+    </div>
+
+    <div style="border-top:1px solid rgba(240,84,36,.12);padding:11px 24px;background:rgba(240,84,36,.03);font-size:.65rem;color:var(--muted)">
+      &#9432; Vagas curadas manualmente a partir do LinkedIn. O LinkedIn nao disponibiliza API publica.
+    </div>
+  </div>
+
+  <!-- RANKING ASSINANTES -->
+  <div class="section-header" style="margin-top:40px">
+    <span class="section-eyebrow">Ranking de Assinantes</span>
+    <div class="section-line"></div>
+  </div>
+
+  <div class="ranking-wrap">
+    <div class="rank-tabs" id="rankingTabs">
+      <button class="rank-tab active" onclick="switchTab('mobile')">Movel (SMP)</button>
+      <button class="rank-tab" onclick="switchTab('fixed')">Banda Larga Fixa (SCM)</button>
+    </div>
+    <div class="rank-panel active" id="panel-mobile">
+      <div class="rank-note">
+        Fonte: <a href="https://informacoes.anatel.gov.br/paineis/acessos/telefonia-movel" target="_blank" rel="noopener">Anatel &middot; Painel de Acessos</a>
+        &nbsp;&middot;&nbsp; <a href="https://www.linkedin.com/company/anatelgovbr2026/" target="_blank" rel="noopener" style="color:#0A66C2">in Anatel 2026</a>
+        &nbsp;&middot;&nbsp; <span id="rank-mobile-ref">Referencia: Q1/2025</span> &nbsp;&middot;&nbsp; Dados em milhoes de linhas ativas
+      </div>
+      <div id="rank-mobile-content"></div>
+    </div>
+    <div class="rank-panel" id="panel-fixed">
+      <div class="rank-note">
+        Fonte: <a href="https://informacoes.anatel.gov.br/paineis/acessos/banda-larga-fixa" target="_blank" rel="noopener">Anatel &middot; Painel de Acessos</a>
+        &nbsp;&middot;&nbsp; <span id="rank-fixed-ref">Referencia: Q1/2025</span> &nbsp;&middot;&nbsp; Dados em milhoes de acessos ativos
+      </div>
+      <div id="rank-fixed-content"></div>
+    </div>
+  </div>
+
+  <!-- RANKING REGIONAL -->
+  <div class="section-header" style="margin-top:40px">
+    <span class="section-eyebrow">Predominancia por Regiao</span>
+    <div class="section-line"></div>
+  </div>
+
+  <div class="regional-wrap">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap">
+      <div class="rank-tabs" style="margin-bottom:0">
+        <button class="rank-tab active" onclick="switchRegionMode('fixed')">Banda Larga Fixa</button>
+        <button class="rank-tab" onclick="switchRegionMode('mobile')">Movel (SMP)</button>
+      </div>
+      <span style="font-size:.67rem;color:var(--muted)">Fonte: <a href="https://informacoes.anatel.gov.br/paineis/acessos" target="_blank" rel="noopener" style="color:var(--cyan);text-decoration:underline;text-underline-offset:2px">Anatel &middot; Paineis de Acessos</a> &middot; Ref. Jun/2026</span>
+    </div>
+    <div class="regions-grid" id="regionsGrid"></div>
+  </div>
+
+  <!-- B3 -->
+  <div class="section-header" style="margin-top:40px">
+    <span class="section-eyebrow">B3 &middot; Telecom</span>
+    <div class="section-line"></div>
+  </div>
+
+  <div class="b3-grid" id="b3Grid">
+    <div class="b3-card loading-card"><div class="spin"></div></div>
+  </div>
+
+  <!-- POR OPERADORA -->
+  <div class="section-header" style="margin-top:40px">
+    <span class="section-eyebrow">Por Operadora</span>
+    <div class="section-line"></div>
+  </div>
+
+  <div class="operators-grid" id="operatorsGrid">
+    <div class="operator-col"><div class="loading-card"><div class="spin"></div>Carregando...</div></div>
+  </div>
+
+  <!-- FONTES -->
+  <div class="sources-section">
+    <div class="section-eyebrow">Fontes de dados</div>
+    <div class="sources-list">
+      <a class="source-pill" href="https://teletime.com.br" target="_blank" rel="noopener"><span class="source-dot"></span>Teletime</a>
+      <a class="source-pill" href="https://telesintese.com.br" target="_blank" rel="noopener"><span class="source-dot"></span>TeleSintese</a>
+      <a class="source-pill" href="https://convergenciadigital.com.br" target="_blank" rel="noopener"><span class="source-dot"></span>Convergencia Digital</a>
+      <a class="source-pill" href="https://www.linkedin.com/in/jose-roberto-nogueira/" target="_blank" rel="noopener"><span class="source-dot" style="background:#0A66C2"></span>LinkedIn &mdash; Roberto Nogueira</a>
+      <a class="source-pill" href="https://www.linkedin.com/company/brisanettelecom/posts/?feedView=all" target="_blank" rel="noopener"><span class="source-dot" style="background:#0A66C2"></span>LinkedIn &mdash; Brisanet Telecom</a>
+      <a class="source-pill" href="https://brapi.dev" target="_blank" rel="noopener"><span class="source-dot" style="background:var(--green)"></span>brapi.dev &middot; B3</a>
+      <a class="source-pill" href="https://informacoes.anatel.gov.br/paineis/acessos" target="_blank" rel="noopener"><span class="source-dot" style="background:var(--yellow)"></span>Anatel &middot; Paineis de Acessos</a>
+      <a class="source-pill" href="https://www.linkedin.com/company/anatelgovbr2026/" target="_blank" rel="noopener"><span class="source-dot" style="background:#0A66C2"></span>LinkedIn &mdash; Anatel 2026</a>
+      <a class="source-pill" href="https://www.fundamentus.com.br/detalhes.php?papel=BRST3" target="_blank" rel="noopener"><span class="source-dot" style="background:#A47FE0"></span>Fundamentus &middot; BRST3</a>
+    </div>
+    <p style="font-size:.67rem;color:var(--muted);margin-top:13px">
+      Cotacoes via <strong style="color:var(--subtle)">Yahoo Finance</strong> (VIVT3, TIMS3, OIBR3) e <strong style="color:var(--subtle)">Fundamentus</strong> (BRST3). Noticias via RSS. Dados Anatel via CKAN ou fallback Q1/2025. Atualizacao automatica a cada 5 minutos. LinkedIn nao possui RSS publico &mdash; acesse o perfil manualmente.
+    </p>
+  </div>
+
+</div>
+
+<script>
+const PROXY = (location.hostname === 'localhost' || location.hostname === '127.0.0.1')
+  ? 'http://localhost:3001/api'
+  : (location.origin + '/api');
+
+// ── Dados ranking (fallback estatico Q1/2025) ─────────────
+// Fonte: Anatel SMP (Telefonia Movel) - Jun/2026
+const MOBILE_RANK = [
+  { name:'Vivo (Telefonica)', subs:105.13, color:'#4A9AF5' },
+  { name:'Claro',             subs: 92.26, color:'#CC1E1E' },
+  { name:'TIM Brasil',        subs: 61.88, color:'#4B6FD5' },
+  { name:'Algar Telecom',     subs:  5.31, color:'#48CFAD' },
+  { name:'Datora (MVNO)',     subs:  4.12, color:'#8B92A5' },
+  { name:'Surf Telecom',      subs:  3.51, color:'#5CC8FF' },
+  { name:'Brisanet',          subs:  1.07, color:'#F05424', brisanet:true },
+  { name:'Outros',            subs:  4.53, color:'#3A4A6A' },
+];
+// Fonte: Anatel SCM (Banda Larga Fixa) - Jun/2026
+const FIXED_RANK = [
+  { name:'Claro',             subs:10.81, color:'#CC1E1E' },
+  { name:'Vivo (Telefonica)', subs: 8.41, color:'#4A9AF5' },
+  { name:'Oi',                subs: 3.43, color:'#F5C518' },
+  { name:'Brisanet',          subs: 1.58, color:'#F05424', brisanet:true },
+  { name:'Brasil Tecpar',     subs: 1.37, color:'#48CFAD' },
+  { name:'Giga+ Fibra',       subs: 1.31, color:'#22C97A' },
+  { name:'Vero',              subs: 1.31, color:'#5CC8FF' },
+  { name:'Desktop / Conexis', subs: 1.20, color:'#8B92A5' },
+  { name:'TIM Brasil',        subs: 0.91, color:'#4B6FD5' },
+  { name:'Unifique',          subs: 0.89, color:'#A47FE0' },
+  { name:'Algar Telecom',     subs: 0.84, color:'#F5A623' },
+  { name:'Alares',            subs: 0.81, color:'#48D1CC' },
+  { name:'Outros ISPs',       subs:22.79, color:'#3A4A6A' },
+];
+
+const REGIONS = [
+  {
+    name:'Nordeste', emoji:'NE',
+    states:'AL &middot; BA &middot; CE &middot; MA &middot; PB &middot; PE &middot; PI &middot; RN &middot; SE',
+    fixed:[
+      { name:'Brisanet', pct:38, color:'#F05424', br:true },
+      { name:'Claro',    pct:22, color:'#CC1E1E' },
+      { name:'Vivo',     pct:13, color:'#4A9AF5' },
+      { name:'Oi',       pct: 9, color:'#F5C518' },
+      { name:'Giga+',    pct: 8, color:'#22C97A' },
+      { name:'Alares',   pct: 7, color:'#48D1CC' },
+      { name:'TIM',      pct: 3, color:'#4B6FD5' },
+    ],
+    mobile:[
+      { name:'Vivo',     pct:36, color:'#4A9AF5' },
+      { name:'Claro',    pct:35, color:'#CC1E1E' },
+      { name:'TIM',      pct:25, color:'#4B6FD5' },
+      { name:'Brisanet', pct: 2, color:'#F05424', br:true },
+      { name:'Outros',   pct: 2, color:'#3A4A6A' },
+    ],
+    leaderFixed:'Brisanet', leaderMobile:'Vivo', leaderFixedColor:'#F05424', leaderMobileColor:'#4A9AF5',
+  },
+  {
+    name:'Sudeste', emoji:'SE',
+    states:'ES &middot; MG &middot; RJ &middot; SP',
+    fixed:[
+      { name:'Claro',       pct:35, color:'#CC1E1E' },
+      { name:'Vivo',        pct:33, color:'#4A9AF5' },
+      { name:'Oi',          pct: 6, color:'#F5C518' },
+      { name:'Desktop',     pct: 6, color:'#48CFAD' },
+      { name:'Giga+',       pct: 4, color:'#22C97A' },
+      { name:'Vero',        pct: 4, color:'#5CC8FF' },
+      { name:'Outros',      pct:12, color:'#3A4A6A' },
+    ],
+    mobile:[
+      { name:'Vivo',  pct:40, color:'#4A9AF5' },
+      { name:'Claro', pct:33, color:'#CC1E1E' },
+      { name:'TIM',   pct:20, color:'#4B6FD5' },
+      { name:'Algar', pct: 4, color:'#F5A623' },
+      { name:'Outros',pct: 3, color:'#3A4A6A' },
+    ],
+    leaderFixed:'Claro', leaderMobile:'Vivo', leaderFixedColor:'#CC1E1E', leaderMobileColor:'#4A9AF5',
+  },
+  {
+    name:'Sul', emoji:'S',
+    states:'PR &middot; RS &middot; SC',
+    fixed:[
+      { name:'Claro',        pct:32, color:'#CC1E1E' },
+      { name:'Vivo',         pct:17, color:'#4A9AF5' },
+      { name:'Oi',           pct:16, color:'#F5C518' },
+      { name:'Unifique',     pct:16, color:'#A47FE0' },
+      { name:'Vero',         pct: 7, color:'#5CC8FF' },
+      { name:'BrasilTecpar', pct: 5, color:'#48CFAD' },
+      { name:'Outros',       pct: 7, color:'#3A4A6A' },
+    ],
+    mobile:[
+      { name:'Vivo',  pct:35, color:'#4A9AF5' },
+      { name:'TIM',   pct:32, color:'#4B6FD5' },
+      { name:'Claro', pct:28, color:'#CC1E1E' },
+      { name:'Outros',pct: 5, color:'#3A4A6A' },
+    ],
+    leaderFixed:'Claro', leaderMobile:'Vivo', leaderFixedColor:'#CC1E1E', leaderMobileColor:'#4A9AF5',
+  },
+  {
+    name:'Centro-Oeste', emoji:'CO',
+    states:'DF &middot; GO &middot; MS &middot; MT',
+    fixed:[
+      { name:'Claro',        pct:31, color:'#CC1E1E' },
+      { name:'Oi',           pct:20, color:'#F5C518' },
+      { name:'Vivo',         pct:17, color:'#4A9AF5' },
+      { name:'BrasilTecpar', pct:16, color:'#48CFAD' },
+      { name:'TIM',          pct: 6, color:'#4B6FD5' },
+      { name:'Vero',         pct: 6, color:'#5CC8FF' },
+      { name:'Outros',       pct: 4, color:'#3A4A6A' },
+    ],
+    mobile:[
+      { name:'Claro', pct:41, color:'#CC1E1E' },
+      { name:'Vivo',  pct:39, color:'#4A9AF5' },
+      { name:'TIM',   pct:18, color:'#4B6FD5' },
+      { name:'Outros',pct: 2, color:'#3A4A6A' },
+    ],
+    leaderFixed:'Claro', leaderMobile:'Claro', leaderFixedColor:'#CC1E1E', leaderMobileColor:'#CC1E1E',
+  },
+  {
+    name:'Norte', emoji:'N',
+    states:'AC &middot; AM &middot; AP &middot; PA &middot; RO &middot; RR &middot; TO',
+    fixed:[
+      { name:'Oi',    pct:41, color:'#F5C518' },
+      { name:'Claro', pct:38, color:'#CC1E1E' },
+      { name:'Vivo',  pct:15, color:'#4A9AF5' },
+      { name:'TIM',   pct: 6, color:'#4B6FD5' },
+    ],
+    mobile:[
+      { name:'Claro', pct:42, color:'#CC1E1E' },
+      { name:'Vivo',  pct:39, color:'#4A9AF5' },
+      { name:'TIM',   pct:17, color:'#4B6FD5' },
+      { name:'Outros',pct: 2, color:'#3A4A6A' },
+    ],
+    leaderFixed:'Oi', leaderMobile:'Claro', leaderFixedColor:'#F5C518', leaderMobileColor:'#CC1E1E',
+  },
+];
+
+const STOCKS = [
+  { sym:'BRST3', name:'Brisanet',        color:'#F05424', brisanet:true },
+  { sym:'VIVT3', name:'Vivo/Telefonica', color:'#4A9AF5' },
+  { sym:'TIMS3', name:'TIM Brasil',      color:'#4B6FD5' },
+  { sym:'OIBR3', name:'Oi',             color:'#F5C518' },
+];
+
+const OPERATORS = [
+  { name:'Vivo / Telefonica', keywords:['vivo','telefonica','vivt3'], color:'#4A9AF5' },
+  { name:'TIM Brasil',        keywords:['tim brasil','tim','tims3'],  color:'#4B6FD5' },
+  { name:'Claro',             keywords:['claro'],                     color:'#CC1E1E' },
+  { name:'Oi',                keywords:['oi ','oibr'],               color:'#F5C518' },
+  { name:'Unifique',           keywords:['unifique'],                  color:'#A47FE0' },
+  { name:'Vero',               keywords:['vero internet','vero fibra','grupo vero'], color:'#5CC8FF' },
+  { name:'Anatel',             keywords:['anatel multa','anatel aprova','anatel proibe','anatel determina','anatel regulamenta','anatel leilao','anatel publica','anatel abre','anatel suspende','anatel notifica'],  color:'#48CFAD' },
+];
+
+// ── Helpers ───────────────────────────────────────────────
+function fmt(n){ return n!=null ? 'R$ '+n.toFixed(2).replace('.',',') : '&mdash;' }
+function fmtPct(n){ return n!=null ? (n>=0?'+':'')+n.toFixed(2).replace('.',',')+' %' : '&mdash;' }
+function timeAgo(d){
+  const diff = Math.floor((Date.now()-new Date(d))/1000);
+  if(diff<60) return 'agora';
+  if(diff<3600) return Math.floor(diff/60)+'min';
+  if(diff<86400) return Math.floor(diff/3600)+'h';
+  return Math.floor(diff/86400)+'d';
+}
+function has(text, kws){ const t=(text||'').toLowerCase(); return kws.some(k=>t.includes(k)); }
+function esc(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+// ── Proxy status ─────────────────────────────────────────
+async function checkProxy(){
+  try{ await fetch(PROXY+'/status',{signal:AbortSignal.timeout(3000)}); }
+  catch{ document.getElementById('proxyBanner').style.display='flex'; }
+}
+
+// ── B3 ───────────────────────────────────────────────────
+async function loadB3(){
+  try{
+    const d = await fetch(PROXY+'/b3',{signal:AbortSignal.timeout(30000)}).then(r=>r.json());
+    const map={};
+    (d.results||[]).forEach(q=>map[q.symbol]=q);
+    renderTicker(map); renderB3Cards(map);
+  }catch{
+    document.getElementById('b3Grid').innerHTML='<div class="error-card" style="grid-column:1/-1">&#9888; Cotacoes indisponiveis &mdash; verifique o servidor proxy.</div>';
+  }
+}
+
+function renderTicker(map){
+  STOCKS.forEach(s=>{
+    const q=map[s.sym]; if(!q) return;
+    const pct=q.regularMarketChangePercent||0;
+    const cls=pct>0.01?'up':pct<-0.01?'dn':'flat';
+    const isFund=q.source==='Fundamentus';
+    ['t-','t2-'].forEach(pfx=>{
+      const pe=document.getElementById(pfx+s.sym+'-p');
+      const ce=document.getElementById(pfx+s.sym+'-c');
+      if(pe) pe.textContent='R$'+q.regularMarketPrice.toFixed(2).replace('.',',');
+      if(ce){ ce.textContent=isFund?'Fundamentus':fmtPct(pct); ce.className='chg '+(isFund?'flat':cls); }
+    });
+    if(s.brisanet){
+      const ph=document.getElementById('brst3-price-header');
+      const ch=document.getElementById('brst3-chg-header');
+      if(ph) ph.textContent='R$ '+q.regularMarketPrice.toFixed(2).replace('.',',');
+      if(ch){ ch.textContent=isFund?(q.lastDate?'ult. '+q.lastDate:'Fundamentus'):fmtPct(pct); ch.className='b3-change flat'; }
+    }
+  });
+}
+
+function renderB3Cards(map){
+  const grid=document.getElementById('b3Grid'); grid.innerHTML='';
+  STOCKS.forEach(s=>{
+    const q=map[s.sym];
+    const card=document.createElement('div');
+    card.className='b3-card'+(s.brisanet?' brisanet-card':'');
+    if(!q){
+      card.innerHTML=`<div class="b3-sym">${s.sym}</div><div class="b3-company">${s.name}</div><div class="b3-price">&mdash;</div><span class="b3-change flat">sem dados</span>`;
+    } else {
+      const pct=q.regularMarketChangePercent||0;
+      const isFund=q.source==='Fundamentus';
+      const cls=pct>0.01?'up':pct<-0.01?'dn':'flat';
+      const arrow=pct>0.01?'&#9650;':pct<-0.01?'&#9660;':'';
+      const vol=(!isFund&&q.regularMarketVolume)?(q.regularMarketVolume/1e6).toFixed(2).replace('.',',')+' M vol.':'';
+      const extra=isFund?`<div class="b3-vol">via Fundamentus${q.lastDate?' &middot; '+q.lastDate:''}</div>`:vol?`<div class="b3-vol">${vol}</div>`:'';
+      card.innerHTML=`
+        <div class="b3-sym">${s.sym}</div>
+        <div class="b3-company">${s.name}</div>
+        <div class="b3-price">R$ ${q.regularMarketPrice.toFixed(2).replace('.',',')}</div>
+        <span class="b3-change ${cls}">${isFund?'variacao n/d':arrow+' '+fmtPct(pct)}</span>
+        ${extra}`;
+    }
+    grid.appendChild(card);
+  });
+}
+
+// ── Noticias ──────────────────────────────────────────────
+const BRST_KW = ['brisanet','brst3','roberto nogueira','nogueira brisanet'];
+
+async function loadAllNews(){
+  try{
+    const [newsData, manualData] = await Promise.all([
+      fetch(PROXY+'/news',{signal:AbortSignal.timeout(45000)}).then(r=>r.json()).catch(()=>({items:[]})),
+      fetch(PROXY+'/noticias-brisanet',{signal:AbortSignal.timeout(5000)}).then(r=>r.json()).catch(()=>({items:[]})),
+    ]);
+    const all    = newsData.items||[];
+    const manual = manualData.items||[];
+
+    // Palavras-chave de todas as operadoras (para deduplicar secoes)
+    const ALL_OP_KW = OPERATORS.flatMap(o=>o.keywords);
+
+    const brNews  = all.filter(n=>has(n.title+' '+(n.link||''), BRST_KW));
+    // Setor: nao e Brisanet E nao pertence a nenhuma operadora especifica
+    const secNews = all.filter(n=>
+      !has(n.title+' '+(n.link||''), BRST_KW) &&
+      !has(n.title+' '+(n.link||''), ALL_OP_KW)
+    );
+    // Operadoras: filtradas individualmente (sem Brisanet)
+    const opNews  = all.filter(n=>!has(n.title+' '+(n.link||''), BRST_KW));
+
+    renderBrisanetNews(manual, brNews, all);
+    renderSectorNews(secNews);
+    renderOperators(opNews);
+  }catch{
+    document.getElementById('brisanetNews').innerHTML='<div class="error-card">&#9888; Noticias indisponiveis. Verifique o servidor proxy.</div>';
+    document.getElementById('sectorNews').innerHTML='<div class="error-card" style="grid-column:1/-1">&#9888; Servidor offline.</div>';
+  }
+}
+
+function newsCardHTML(item){ return `
+  <div class="news-title">${esc(item.title)}</div>
+  <div class="news-meta">
+    <span class="news-source" style="color:${item.color}">${esc(item.source)}</span>
+    <span class="news-sep"></span>
+    <span>${timeAgo(item.date)}</span>
+  </div>`; }
+
+function renderBrisanetNews(manual, rssItems, all){
+  const c=document.getElementById('brisanetNews'); c.innerHTML='';
+
+  // Noticias manuais (LinkedIn, etc.) — sempre no topo, card destacado
+  manual.forEach(n=>{
+    const a=document.createElement('a');
+    a.className='brisanet-news-card';
+    a.href=n.link; a.target='_blank'; a.rel='noopener';
+    a.style.cssText='border-left:3px solid var(--brisanet)';
+    const tag=n.tag?`<span style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--brisanet);background:rgba(240,84,36,.12);padding:2px 6px;border-radius:3px;margin-bottom:6px;display:inline-block">${esc(n.tag)}</span><br>`:'';
+    const li=`<span style="font-size:.6rem;font-weight:700;color:#0A66C2;text-transform:uppercase;letter-spacing:.06em">in LinkedIn</span>`;
+    const video=n.link_video?` &nbsp;<a href="${esc(n.link_video)}" target="_blank" rel="noopener" style="font-size:.65rem;color:var(--cyan);font-weight:600" onclick="event.stopPropagation()">Ver entrevista &rarr;</a>`:'';
+    a.innerHTML=`
+      <div>${tag}<div class="news-title">${esc(n.titulo)}</div></div>
+      <div class="news-meta" style="margin-top:6px">
+        ${li}<span class="news-sep"></span>
+        <span style="color:var(--muted);font-size:.67rem">${n.data||''}</span>
+        ${video}
+      </div>
+      ${n.descricao?`<div style="font-size:.73rem;color:var(--subtle);line-height:1.5;margin-top:8px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden">${esc(n.descricao)}</div>`:''}`;
+    c.appendChild(a);
+  });
+
+  // Noticias RSS filtradas por Brisanet/Roberto Nogueira
+  const slots = Math.max(0, 8 - manual.length);
+  if(rssItems.length && slots > 0){
+    rssItems.slice(0, slots).forEach(n=>{
+      const a=document.createElement('a');
+      a.className='brisanet-news-card'; a.href=n.link; a.target='_blank'; a.rel='noopener';
+      a.innerHTML=newsCardHTML(n); c.appendChild(a);
+    });
+  } else if(!rssItems.length && !manual.length){
+    const note=document.createElement('div');
+    note.style.cssText='padding:20px 22px;font-size:.75rem;color:var(--muted);grid-column:1/-1;text-align:center';
+    note.textContent='Sem publicacoes recentes sobre a Brisanet ou Roberto Nogueira.';
+    c.appendChild(note);
+  }
+}
+
+function renderSectorNews(items){
+  const c=document.getElementById('sectorNews'); c.innerHTML='';
+  if(!items.length){ c.innerHTML='<div class="no-results" style="grid-column:1/-1">Sem noticias gerais do setor.</div>'; return; }
+  items.slice(0,12).forEach(n=>{
+    const a=document.createElement('a');
+    a.className='sector-news-card'; a.href=n.link; a.target='_blank'; a.rel='noopener';
+    a.innerHTML=newsCardHTML(n); c.appendChild(a);
+  });
+}
+
+function renderOperators(all){
+  const grid=document.getElementById('operatorsGrid'); grid.innerHTML='';
+  OPERATORS.forEach(op=>{
+    const items=all.filter(n=>has(n.title+' '+(n.link||''),op.keywords));
+    const col=document.createElement('div'); col.className='operator-col';
+    const h=document.createElement('div'); h.className='operator-col-header';
+    h.innerHTML=`<span class="op-dot" style="background:${op.color}"></span><span class="op-name">${esc(op.name)}</span><span class="op-count">${items.length} noticias</span>`;
+    col.appendChild(h);
+    const list=document.createElement('div'); list.className='news-list';
+    if(!items.length){ list.innerHTML='<div class="no-results">Sem noticias recentes</div>'; }
+    else { items.slice(0,5).forEach(n=>{ const a=document.createElement('a'); a.className='news-card'; a.href=n.link; a.target='_blank'; a.rel='noopener'; a.innerHTML=newsCardHTML(n); list.appendChild(a); }); }
+    col.appendChild(list); grid.appendChild(col);
+  });
+}
+
+// ── Anatel live ──────────────────────────────────────────
+async function loadAnatelRanking(){
+  try{
+    const d=await fetch(PROXY+'/anatel',{signal:AbortSignal.timeout(20000)}).then(r=>r.json());
+    if(!d.mobile||!d.fixed) return;
+    const badge=d.source==='live'
+      ?'<span style="color:var(--green);font-weight:700">&#9679; ao vivo</span>'
+      :'<span style="color:var(--yellow);font-weight:700">&#9679; fallback</span>';
+    document.getElementById('rank-mobile-ref').innerHTML=badge+' &nbsp;'+d.ref;
+    document.getElementById('rank-fixed-ref').innerHTML=badge+' &nbsp;'+d.ref;
+    buildRanking(d.mobile,'rank-mobile-content');
+    buildRanking(d.fixed,'rank-fixed-content');
+  }catch{ /* usa fallback estatico */ }
+}
+
+// ── Ranking build ────────────────────────────────────────
+function buildRanking(data,cid){
+  const total=data.reduce((s,d)=>s+d.subs,0);
+  const max=data[0].subs;
+  const el=document.getElementById(cid);
+  let html=`<div class="rank-row header-row">
+    <span class="rank-label">#</span>
+    <span class="rank-label">Operadora</span>
+    <span class="rank-label">Part.</span>
+    <span class="rank-label" style="text-align:right">Assinantes</span>
+    <span class="rank-label" style="text-align:right">Market Share</span>
+  </div>`;
+  data.forEach((d,i)=>{
+    const share=((d.subs/total)*100).toFixed(1);
+    const barW=((d.subs/max)*100).toFixed(1);
+    const br=d.brisanet;
+    const nb=d.note?`<span class="mvno-badge">${d.note}</span>`:'';
+    html+=`<div class="rank-row${br?' rank-brisanet-row':''}">
+      <span class="rank-pos">${i===0?'#1':i===1?'#2':i===2?'#3':i+1}</span>
+      <span class="rank-name${br?' br':''}"><span class="rank-name-dot" style="background:${d.color}"></span>${esc(d.name)}${nb}</span>
+      <div class="rank-bar-wrap"><div class="rank-bar" style="width:${barW}%;background:${d.color};opacity:${br?1:.7}"></div></div>
+      <span class="rank-subs${br?' br':''}">${d.subs.toFixed(1).replace('.',',')} M</span>
+      <span class="rank-share">${share.replace('.',',')} %</span>
+    </div>`;
+  });
+  el.innerHTML=html+`<div class="total-strip"><span style="color:var(--subtle);font-size:.74rem">Total do mercado</span><strong>${total.toFixed(1).replace('.',',')} M</strong></div>`;
+}
+
+function switchTab(tab){
+  document.querySelectorAll('#rankingTabs .rank-tab').forEach((t,i)=>t.classList.toggle('active',(i===0&&tab==='mobile')||(i===1&&tab==='fixed')));
+  document.getElementById('panel-mobile').classList.toggle('active',tab==='mobile');
+  document.getElementById('panel-fixed').classList.toggle('active',tab==='fixed');
+}
+
+// ── Regional ─────────────────────────────────────────────
+let regionMode='fixed';
+function switchRegionMode(m){
+  regionMode=m;
+  document.querySelectorAll('.regional-wrap .rank-tabs .rank-tab').forEach((t,i)=>t.classList.toggle('active',(i===0&&m==='fixed')||(i===1&&m==='mobile')));
+  buildRegions();
+}
+function buildRegions(){
+  const grid=document.getElementById('regionsGrid'); grid.innerHTML='';
+  REGIONS.forEach(r=>{
+    const data=regionMode==='fixed'?r.fixed:r.mobile;
+    const leader=regionMode==='fixed'?r.leaderFixed:r.leaderMobile;
+    const lColor=regionMode==='fixed'?r.leaderFixedColor:r.leaderMobileColor;
+    const maxP=Math.max(...data.map(d=>d.pct));
+    const card=document.createElement('div'); card.className='region-card';
+    card.innerHTML=`
+      <div class="region-header">
+        <div>
+          <div class="region-name">${r.emoji} &nbsp;${r.name}</div>
+          <div class="region-states">${r.states}</div>
+        </div>
+        <div class="region-leader">
+          <div class="region-leader-label">Lider</div>
+          <div class="region-leader-name" style="color:${lColor}">${leader}</div>
+        </div>
+      </div>
+      <div class="region-divider"></div>
+      <div class="region-bars">${data.map(d=>`
+        <div class="region-bar-row">
+          <span class="region-bar-label${d.br?' br':''}">${d.name}</span>
+          <div class="region-bar-bg"><div class="region-bar-fill" style="width:${(d.pct/maxP*100).toFixed(0)}%;background:${d.color};opacity:${d.br?1:.75}"></div></div>
+          <span class="region-bar-pct${d.br?' br':''}">${d.pct}%</span>
+        </div>`).join('')}
+      </div>`;
+    grid.appendChild(card);
+  });
+}
+
+// ── Clock ─────────────────────────────────────────────────
+function updateClock(){
+  const n=new Date();
+  document.getElementById('updateTime').textContent=
+    'Atualizado: '+n.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})+
+    ' &middot; '+n.toLocaleDateString('pt-BR',{day:'2-digit',month:'short',year:'numeric'});
+}
+
+// ── Vagas ─────────────────────────────────────────────────
+async function loadVagas(){
+  const grid = document.getElementById('vagasGrid');
+  const dataEl = document.getElementById('vagasData');
+  try {
+    const d = await fetch(PROXY+'/vagas',{signal:AbortSignal.timeout(8000)}).then(r=>r.json());
+    if(dataEl && d.atualizado) dataEl.textContent = d.atualizado;
+    const vagas = d.vagas || [];
+    if(!vagas.length){
+      grid.innerHTML = `
+        <div style="grid-column:1/-1;padding:28px 24px;text-align:center">
+          <div style="font-size:.85rem;color:var(--subtle);margin-bottom:10px">Nenhuma vaga cadastrada ainda.</div>
+          <div style="font-size:.71rem;color:var(--muted)">Passe as vagas do LinkedIn e elas aparecerao aqui automaticamente.</div>
+        </div>`;
+      return;
+    }
+    grid.innerHTML = vagas.map(v => `
+      <a href="${esc(v.link||'#')}" target="_blank" rel="noopener"
+         style="display:block;background:var(--card);padding:18px 22px;cursor:pointer;transition:background .15s;text-decoration:none"
+         onmouseover="this.style.background='rgba(240,84,36,.06)'" onmouseout="this.style.background='var(--card)'">
+        <div style="font-family:'Syne',sans-serif;font-size:.85rem;font-weight:700;color:#fff;margin-bottom:6px;line-height:1.3">${esc(v.titulo)}</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px">
+          ${v.area    ? `<span style="font-size:.63rem;font-weight:700;padding:2px 8px;border-radius:4px;background:rgba(240,84,36,.15);color:var(--brisanet)">${esc(v.area)}</span>` : ''}
+          ${v.modalidade ? `<span style="font-size:.63rem;font-weight:700;padding:2px 8px;border-radius:4px;background:rgba(0,200,224,.1);color:var(--cyan)">${esc(v.modalidade)}</span>` : ''}
+          ${v.nivel   ? `<span style="font-size:.63rem;font-weight:600;padding:2px 8px;border-radius:4px;background:var(--surface);color:var(--subtle)">${esc(v.nivel)}</span>` : ''}
+        </div>
+        ${v.descricao ? `<div style="font-size:.74rem;color:var(--subtle);line-height:1.5;margin-bottom:8px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${esc(v.descricao)}</div>` : ''}
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-top:6px">
+          <span style="font-size:.65rem;color:var(--muted)">${v.publicado ? 'Publicado: '+v.publicado : ''}</span>
+          <span style="font-size:.68rem;font-weight:700;color:var(--brisanet)">Ver vaga &rarr;</span>
+        </div>
+      </a>`).join('');
+  } catch {
+    grid.innerHTML = `<div style="grid-column:1/-1;padding:20px;text-align:center;font-size:.76rem;color:var(--muted)">&#9888; Nao foi possivel carregar as vagas. Verifique o servidor proxy.</div>`;
+  }
+}
+
+// ── Refresh ───────────────────────────────────────────────
+async function refresh(){
+  updateClock();
+  await Promise.all([loadB3(), loadAllNews()]);
+}
+
+// ── Init ──────────────────────────────────────────────────
+checkProxy();
+buildRanking(MOBILE_RANK,'rank-mobile-content');
+buildRanking(FIXED_RANK,'rank-fixed-content');
+buildRegions();
+loadAnatelRanking();
+loadVagas();
+refresh();
+setInterval(refresh, 5*60*1000);
+</script>
+</body>
+</html>
