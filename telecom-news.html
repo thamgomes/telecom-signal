@@ -672,7 +672,10 @@ function renderBrisanetNews(manual, rssItems, all){
     a.href=n.link; a.target='_blank'; a.rel='noopener';
     a.style.cssText='border-left:3px solid var(--brisanet)';
     const tag=n.tag?`<span style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--brisanet);background:rgba(240,84,36,.12);padding:2px 6px;border-radius:3px;margin-bottom:6px;display:inline-block">${esc(n.tag)}</span><br>`:'';
-    const li=`<span style="font-size:.6rem;font-weight:700;color:#0A66C2;text-transform:uppercase;letter-spacing:.06em">in LinkedIn</span>`;
+    const isLI=n.fonte&&n.fonte.toLowerCase().includes('linkedin');
+    const liColor=isLI?'#0A66C2':'var(--subtle)';
+    const liLabel=n.fonte||'LinkedIn';
+    const li=`<span style="font-size:.6rem;font-weight:700;color:${liColor};text-transform:uppercase;letter-spacing:.06em">${isLI?'in ':''} ${esc(liLabel)}</span>`;
     const video=n.link_video?` &nbsp;<a href="${esc(n.link_video)}" target="_blank" rel="noopener" style="font-size:.65rem;color:var(--cyan);font-weight:600" onclick="event.stopPropagation()">Ver entrevista &rarr;</a>`:'';
     a.innerHTML=`
       <div>${tag}<div class="news-title">${esc(n.titulo)}</div></div>
