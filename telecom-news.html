@@ -744,7 +744,7 @@ function renderSectorNews(items){
 function renderOperators(all){
   const grid=document.getElementById('operatorsGrid'); grid.innerHTML='';
   OPERATORS.forEach(op=>{
-    const items=all.filter(n=>has(n.title+' '+(n.link||''),op.keywords));
+    const items=all.filter(n=>has(n.title,op.keywords));
     const col=document.createElement('div'); col.className='operator-col';
     const h=document.createElement('div'); h.className='operator-col-header';
     h.innerHTML=`<span class="op-dot" style="background:${op.color}"></span><span class="op-name">${esc(op.name)}</span><span class="op-count">${items.length} noticias</span>`;
