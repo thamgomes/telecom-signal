@@ -558,7 +558,13 @@ function timeAgo(d){
   if(diff<86400) return Math.floor(diff/3600)+'h';
   return Math.floor(diff/86400)+'d';
 }
-function has(text, kws){ const t=(text||'').toLowerCase(); return kws.some(k=>t.includes(k)); }
+function has(text, kws){
+  const t=(text||'').toLowerCase();
+  return kws.some(k=>{
+    const re=new RegExp('(?:^|[\\s,.(\\-])'+k.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'(?:$|[\\s,.)\\-])', 'i');
+    return re.test(t);
+  });
+}
 function esc(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
 // ── Proxy status ─────────────────────────────────────────
