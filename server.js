@@ -407,19 +407,19 @@ app.get('/api/noticias-brisanet', (req, res) => {
   }
 });
 
-// Contador de acessos - persiste em visits.json
-const VISITS_FILE = path.join(__dirname, 'visits.json');
-function readVisits() {
-  try { return JSON.parse(fs.readFileSync(VISITS_FILE, 'utf8')).count || 0; } catch { return 0; }
-}
-function writeVisits(n) {
-  try { fs.writeFileSync(VISITS_FILE, JSON.stringify({ count: n }), 'utf8'); } catch {}
-}
+// Contador de acessos - Upstash Redis (persistente)
+const UPSTASH_URL   = process.env.UPSTASH_URL   || 'https://real-koala-177450.upstash.io';
+const UPSTASH_TOKEN = process.env.UPSTASH_TOKEN || 'gQAAAAAAArUqAAIgcDE3MTJiNjU2NDQ1NWE0NzJjYTA5NjU0OGI2YTI1NWJlZg';
 
-app.get('/api/visits', (req, res) => {
-  const n = readVisits() + 1;
-  writeVisits(n);
-  res.json({ count: n });
+app.get('/api/visits', async (req, res) => {
+  try {
+    const r = await fetchJson(UPSTASH_URL + '/incr/telecom_visits', {
+      headers: { Authorization: 'Bearer ' + UPSTASH_TOKEN },
+    });
+    res.json({ count: r.result || 0 });
+  } catch(e) {
+    res.json({ count: 0 });
+  }
 });
 
 app.get('/api/status', (_, res) => res.json({
