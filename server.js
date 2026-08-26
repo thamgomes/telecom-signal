@@ -108,12 +108,32 @@ async function fetchBrst3Brapi() {
   };
 }
 
+async function fetchBrst3Fundamentus() {
+  const { text } = await fetchText('https://www.fundamentus.com.br/detalhes.php?papel=BRST3', {
+    insecure: true, encoding: 'latin1', timeout: 15000,
+    headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)', 'Accept': 'text/html', 'Referer': 'https://www.fundamentus.com.br/resultado.php' },
+  });
+  const spans = [...text.matchAll(/<span[^>]*>([\d]+[,.][\d]+)<\/span>/g)];
+  if (!spans.length) throw new Error('BRST3: nenhum span no Fundamentus');
+  const price = parseFloat(spans[0][1].replace(',', '.'));
+  if (!price || isNaN(price)) throw new Error('BRST3: preco invalido no Fundamentus');
+  return { symbol:'BRST3', regularMarketPrice:price, regularMarketChangePercent:0, regularMarketVolume:0, brisanet:true };
+}
+
+async function fetchBrst3() {
+  try { return await fetchBrst3Brapi(); }
+  catch(e) {
+    console.warn('[BRST3] brapi falhou (' + e.message + '), tentando Fundamentus...');
+    return await fetchBrst3Fundamentus();
+  }
+}
+
 app.get('/api/b3', async (req, res) => {
   const cached = getCache('b3');
   if (isFresh(cached)) return res.json(cached.data);
 
   const results = await Promise.allSettled([
-    fetchBrst3Brapi(),
+    fetchBrst3(),
     ...YAHOO_STOCKS.map(s => fetchYahooStock(s.sym)),
   ]);
 
