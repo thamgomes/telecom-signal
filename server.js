@@ -161,21 +161,6 @@ const RSS_FEEDS = [
 ];
 const rssParser = new RssParser({ timeout: 30000 });
 
-const TRANS_CACHE = {};
-async function translateEN(text) {
-  if (!text) return text;
-  if (TRANS_CACHE[text]) return TRANS_CACHE[text];
-  try {
-    const encoded = encodeURIComponent(text.slice(0, 400));
-    const url = 'https://lingva.ml/api/v1/en/pt/' + encoded;
-    const json = await fetchJson(url, { timeout: 10000 });
-    const translated = (json && json.translation) ? json.translation : text;
-    TRANS_CACHE[text] = translated;
-    return translated;
-  } catch (e) {
-    return text;
-  }
-}
 
 app.get('/api/news', async (req, res) => {
   const cached = getCache('news');
@@ -202,14 +187,6 @@ app.get('/api/news', async (req, res) => {
     else console.warn('[News] ' + RSS_FEEDS[i].name + ': ' + r.reason?.message);
   });
   all.sort((a, b) => new Date(b.date) - new Date(a.date));
-
-  // Traduz titulos das fontes internacionais (en -> pt-BR)
-  const toTranslate = all.filter(n => n.lang === 'en');
-  await Promise.allSettled(
-    toTranslate.map(async n => {
-      n.title = await translateEN(n.title);
-    })
-  );
 
   const data = { items: all, fetchedAt: new Date().toISOString() };
   setCache('news', data, 10 * 60 * 1000);

@@ -648,14 +648,34 @@ async function loadAllNews(){
     renderBrisanetNews(manual, brNews, all);
     renderSectorNews(secNews);
     renderOperators(opNews);
+    // Traduz titulos em ingles no browser
+    document.querySelectorAll('[data-entitle]').forEach(el=>{
+      translateTitle(el, el.getAttribute('data-entitle'));
+    });
   }catch{
     document.getElementById('brisanetNews').innerHTML='<div class="error-card">&#9888; Noticias indisponiveis. Verifique o servidor proxy.</div>';
     document.getElementById('sectorNews').innerHTML='<div class="error-card" style="grid-column:1/-1">&#9888; Servidor offline.</div>';
   }
 }
 
-function newsCardHTML(item){ return `
-  <div class="news-title">${esc(item.title)}</div>
+const _tc = {};
+async function translateTitle(el, text) {
+  if (_tc[text]) { el.textContent = _tc[text]; return; }
+  try {
+    const enc = encodeURIComponent(text.slice(0,400));
+    const r = await fetch('https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=pt-BR&dt=t&q='+enc);
+    const j = await r.json();
+    let out = '';
+    if (Array.isArray(j) && Array.isArray(j[0])) j[0].forEach(p=>{ if(p[0]) out+=p[0]; });
+    if (out) { _tc[text]=out; el.textContent=out; }
+  } catch(e) {}
+}
+
+function newsCardHTML(item){
+  const needsTranslation = item.lang === 'en';
+  const titleAttr = needsTranslation ? ` data-entitle="${esc(item.title)}"` : '';
+  return `
+  <div class="news-title"${titleAttr}>${esc(item.title)}</div>
   <div class="news-meta">
     <span class="news-source" style="color:${item.color}">${esc(item.source)}</span>
     <span class="news-sep"></span>
