@@ -71,8 +71,7 @@ const YAHOO_STOCKS = [
   { sym:'VIVT3.SA', name:'Vivo (Telefonica)', display:'VIVT3', color:'#4A9AF5' },
   { sym:'TIMS3.SA', name:'TIM Brasil',        display:'TIMS3', color:'#4B6FD5' },
   { sym:'OIBR3.SA', name:'Oi',               display:'OIBR3', color:'#F5C518' },
-  { sym:'AMXL34.SA', name:'Claro (América Móvil)', display:'AMXL34', color:'#CC1E1E' },
-  { sym:'FIQE3.SA',  name:'Unifique',          display:'FIQE3',  color:'#A47FE0' },
+  { sym:'FIQE3.SA', name:'Unifique', display:'FIQE3', color:'#A47FE0' },
 ];
 
 async function fetchYahooStock(sym) {
