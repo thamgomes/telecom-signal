@@ -637,14 +637,16 @@ const BRST_KW = ['brisanet','brst3','roberto nogueira','nogueira brisanet'];
 
 async function loadAllNews(){
   try{
-    const [newsData, manualData, brRssData] = await Promise.all([
+    const [newsData, manualData, brRssData, febRssData] = await Promise.all([
       fetch(PROXY+'/news',{signal:AbortSignal.timeout(45000)}).then(r=>r.json()).catch(()=>({items:[]})),
       fetch(PROXY+'/noticias-brisanet',{signal:AbortSignal.timeout(5000)}).then(r=>r.json()).catch(()=>({items:[]})),
       fetch(PROXY+'/news-brisanet-rss',{signal:AbortSignal.timeout(15000)}).then(r=>r.json()).catch(()=>({items:[]})),
+      fetch(PROXY+'/news-febraban-rss',{signal:AbortSignal.timeout(15000)}).then(r=>r.json()).catch(()=>({items:[]})),
     ]);
     const all    = newsData.items||[];
     const manual = manualData.items||[];
     const brRss  = brRssData.items||[];
+    const febRss = (febRssData.items||[]).map(n=>({...n, source:'Febraban Tech · '+n.source, color:'#22C97A'}));
 
     // Palavras-chave de todas as operadoras (para deduplicar secoes)
     const ALL_OP_KW = OPERATORS.flatMap(o=>o.keywords);
@@ -659,7 +661,7 @@ async function loadAllNews(){
     const opNews  = all.filter(n=>!has(n.title+' '+(n.link||''), BRST_KW));
 
     renderBrisanetNews(manual, [...brNews, ...brRss], all);
-    renderSectorNews(secNews);
+    renderSectorNews([...secNews, ...febRss]);
     renderOperators(opNews);
     // Traduz titulos em ingles no browser
     document.querySelectorAll('[data-entitle]').forEach(el=>{

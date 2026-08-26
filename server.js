@@ -160,7 +160,8 @@ const RSS_FEEDS = [
   { name:'TeleGeography',       url:'https://www.telegeography.com/products/commsupdate/rss/', color:'#5CC8FF', lang:'en' },
 ];
 
-const BRISANET_RSS_URL = 'https://news.google.com/rss/search?q=brisanet&hl=pt-BR&gl=BR&ceid=BR:pt-419';
+const BRISANET_RSS_URL  = 'https://news.google.com/rss/search?q=brisanet&hl=pt-BR&gl=BR&ceid=BR:pt-419';
+const FEBRABAN_RSS_URL  = 'https://news.google.com/rss/search?q=Febraban+Tech+5G+OR+IoT&hl=pt-BR&gl=BR&ceid=BR:pt-419';
 
 app.get('/api/news-brisanet-rss', async (req, res) => {
   const cached = getCache('news-brisanet-rss');
@@ -181,6 +182,26 @@ app.get('/api/news-brisanet-rss', async (req, res) => {
     res.json({ items: [] });
   }
 });
+app.get('/api/news-febraban-rss', async (req, res) => {
+  const cached = getCache('news-febraban-rss');
+  if (isFresh(cached)) return res.json(cached.data);
+  try {
+    const feed = await rssParser.parseURL(FEBRABAN_RSS_URL);
+    const items = (feed.items || []).slice(0, 15).map(item => ({
+      title:  item.title?.trim(),
+      link:   item.link,
+      date:   item.pubDate || item.isoDate,
+      source: item.source?.title || 'Google News',
+    }));
+    const data = { items, fetchedAt: new Date().toISOString() };
+    setCache('news-febraban-rss', data, 30 * 60 * 1000);
+    res.json(data);
+  } catch(e) {
+    console.warn('[FebrabancRSS] ' + e.message);
+    res.json({ items: [] });
+  }
+});
+
 const rssParser = new RssParser({ timeout: 30000 });
 
 
