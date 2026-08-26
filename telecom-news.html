@@ -218,7 +218,12 @@ header{padding:28px 40px 22px;display:flex;align-items:flex-end;justify-content:
     <div class="brand-sub">Painel de Noticias &amp; Mercado &middot; Brasil</div>
   </div>
   <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
-    <span class="live-badge"><span class="live-dot"></span> Ao vivo</span>
+    <div style="display:flex;align-items:center;gap:8px">
+      <span class="live-badge"><span class="live-dot"></span> Ao vivo</span>
+      <span id="visitCounter" style="font-size:.65rem;font-weight:600;color:var(--muted);letter-spacing:.05em;display:none">
+        &#128065; <span id="visitCount">...</span> acessos
+      </span>
+    </div>
     <span class="update-time" id="updateTime">Carregando...</span>
   </div>
 </header>
@@ -843,7 +848,7 @@ function updateClock(){
   const n=new Date();
   document.getElementById('updateTime').textContent=
     'Atualizado: '+n.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})+
-    ' &middot; '+n.toLocaleDateString('pt-BR',{day:'2-digit',month:'short',year:'numeric'});
+    ' · '+n.toLocaleDateString('pt-BR',{day:'2-digit',month:'short',year:'numeric'});
 }
 
 // ── Vagas ─────────────────────────────────────────────────
@@ -888,6 +893,18 @@ async function refresh(){
   updateClock();
   await Promise.all([loadB3(), loadAllNews()]);
 }
+
+// ── Contador de acessos ───────────────────────────────────
+(async function loadVisits(){
+  try {
+    const r = await fetch('https://api.countapi.xyz/hit/telecom-signal-br/visits');
+    const j = await r.json();
+    if (j && j.value) {
+      document.getElementById('visitCount').textContent = j.value.toLocaleString('pt-BR');
+      document.getElementById('visitCounter').style.display = 'inline-flex';
+    }
+  } catch(e) {}
+})();
 
 // ── Init ──────────────────────────────────────────────────
 checkProxy();
