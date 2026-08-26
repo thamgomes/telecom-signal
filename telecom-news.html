@@ -560,10 +560,7 @@ function timeAgo(d){
 }
 function has(text, kws){
   const t=(text||'').toLowerCase();
-  return kws.some(k=>{
-    const re=new RegExp('(?:^|[\\s,.(\\-])'+k.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'(?:$|[\\s,.)\\-])', 'i');
-    return re.test(t);
-  });
+  return kws.some(k=>new RegExp('\\b'+k.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'\\b').test(t));
 }
 function esc(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
