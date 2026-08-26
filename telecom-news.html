@@ -897,10 +897,9 @@ async function refresh(){
 // ── Contador de acessos ───────────────────────────────────
 (async function loadVisits(){
   try {
-    const r = await fetch('https://api.countapi.xyz/hit/telecom-signal-br/visits');
-    const j = await r.json();
-    if (j && j.value) {
-      document.getElementById('visitCount').textContent = j.value.toLocaleString('pt-BR');
+    const j = await fetch(PROXY+'/visits').then(r=>r.json());
+    if (j && j.count) {
+      document.getElementById('visitCount').textContent = j.count.toLocaleString('pt-BR');
       document.getElementById('visitCounter').style.display = 'inline-flex';
     }
   } catch(e) {}

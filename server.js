@@ -407,6 +407,21 @@ app.get('/api/noticias-brisanet', (req, res) => {
   }
 });
 
+// Contador de acessos - persiste em visits.json
+const VISITS_FILE = path.join(__dirname, 'visits.json');
+function readVisits() {
+  try { return JSON.parse(fs.readFileSync(VISITS_FILE, 'utf8')).count || 0; } catch { return 0; }
+}
+function writeVisits(n) {
+  try { fs.writeFileSync(VISITS_FILE, JSON.stringify({ count: n }), 'utf8'); } catch {}
+}
+
+app.get('/api/visits', (req, res) => {
+  const n = readVisits() + 1;
+  writeVisits(n);
+  res.json({ count: n });
+});
+
 app.get('/api/status', (_, res) => res.json({
   uptime: process.uptime().toFixed(0) + 's',
   cache: Object.entries(CACHE).map(([k, v]) => ({
