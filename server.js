@@ -152,11 +152,25 @@ app.get('/api/b3', async (req, res) => {
 
 // RSS News
 const RSS_FEEDS = [
-  { name:'Teletime',            url:'https://teletime.com.br/feed/',                color:'#4A9AF5' },
-  { name:'TeleSintese',         url:'https://telesintese.com.br/feed/',             color:'#A47FE0' },
-  { name:'Convergencia Digital',url:'https://www.convergenciadigital.com.br/feed/', color:'#48CFAD' },
+  { name:'Teletime',            url:'https://teletime.com.br/feed/',                color:'#4A9AF5', lang:'pt' },
+  { name:'TeleSintese',         url:'https://telesintese.com.br/feed/',             color:'#A47FE0', lang:'pt' },
+  { name:'Convergencia Digital',url:'https://www.convergenciadigital.com.br/feed/', color:'#48CFAD', lang:'pt' },
+  { name:'Telecompaper',        url:'https://www.telecompaper.com/rss/news--1',     color:'#22C97A', lang:'en' },
 ];
 const rssParser = new RssParser({ timeout: 30000 });
+
+async function translateMyMemory(text) {
+  if (!text) return text;
+  try {
+    const encoded = encodeURIComponent(text.slice(0, 500));
+    const url = 'https://api.mymemory.translated.net/get?q=' + encoded + '&langpair=en|pt-BR';
+    const json = await fetchJson(url, { timeout: 8000 });
+    const t = json && json.responseData && json.responseData.translatedText;
+    return (t && t !== text) ? t : text;
+  } catch (e) {
+    return text;
+  }
+}
 
 app.get('/api/news', async (req, res) => {
   const cached = getCache('news');
@@ -165,12 +179,13 @@ app.get('/api/news', async (req, res) => {
   const results = await Promise.allSettled(
     RSS_FEEDS.map(f =>
       rssParser.parseURL(f.url).then(feed =>
-        (feed.items || []).slice(0, 50).map(item => ({
+        (feed.items || []).slice(0, 30).map(item => ({
           title:  item.title?.trim(),
           link:   item.link,
           date:   item.pubDate || item.isoDate,
           source: f.name,
           color:  f.color,
+          lang:   f.lang,
         }))
       )
     )
@@ -182,6 +197,14 @@ app.get('/api/news', async (req, res) => {
     else console.warn('[News] ' + RSS_FEEDS[i].name + ': ' + r.reason?.message);
   });
   all.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+  // Traduz titulos do Telecompaper (en -> pt-BR)
+  const toTranslate = all.filter(n => n.lang === 'en');
+  await Promise.allSettled(
+    toTranslate.map(async n => {
+      n.title = await translateMyMemory(n.title);
+    })
+  );
 
   const data = { items: all, fetchedAt: new Date().toISOString() };
   setCache('news', data, 10 * 60 * 1000);
