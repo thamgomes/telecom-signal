@@ -166,14 +166,10 @@ async function translateEN(text) {
   if (!text) return text;
   if (TRANS_CACHE[text]) return TRANS_CACHE[text];
   try {
-    const encoded = encodeURIComponent(text.slice(0, 500));
-    const url = 'https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=pt-BR&dt=t&q=' + encoded;
-    const json = await fetchJson(url, { timeout: 8000 });
-    let result = '';
-    if (Array.isArray(json) && Array.isArray(json[0])) {
-      json[0].forEach(part => { if (part[0]) result += part[0]; });
-    }
-    const translated = result || text;
+    const encoded = encodeURIComponent(text.slice(0, 400));
+    const url = 'https://lingva.ml/api/v1/en/pt/' + encoded;
+    const json = await fetchJson(url, { timeout: 10000 });
+    const translated = (json && json.translation) ? json.translation : text;
     TRANS_CACHE[text] = translated;
     return translated;
   } catch (e) {
