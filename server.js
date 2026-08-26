@@ -152,10 +152,12 @@ app.get('/api/b3', async (req, res) => {
 
 // RSS News
 const RSS_FEEDS = [
-  { name:'Teletime',            url:'https://teletime.com.br/feed/',                color:'#4A9AF5', lang:'pt' },
-  { name:'TeleSintese',         url:'https://telesintese.com.br/feed/',             color:'#A47FE0', lang:'pt' },
-  { name:'Convergencia Digital',url:'https://www.convergenciadigital.com.br/feed/', color:'#48CFAD', lang:'pt' },
-  { name:'Telecompaper',        url:'https://www.telecompaper.com/rss/news--1',     color:'#22C97A', lang:'en' },
+  { name:'Teletime',            url:'https://teletime.com.br/feed/',                           color:'#4A9AF5', lang:'pt' },
+  { name:'TeleSintese',         url:'https://telesintese.com.br/feed/',                        color:'#A47FE0', lang:'pt' },
+  { name:'Convergencia Digital',url:'https://www.convergenciadigital.com.br/feed/',            color:'#48CFAD', lang:'pt' },
+  { name:'Light Reading',       url:'https://www.lightreading.com/rss.xml',                    color:'#22C97A', lang:'en' },
+  { name:'RCR Wireless',        url:'https://www.rcrwireless.com/feed',                        color:'#F5A623', lang:'en' },
+  { name:'TeleGeography',       url:'https://www.telegeography.com/products/commsupdate/rss/', color:'#5CC8FF', lang:'en' },
 ];
 const rssParser = new RssParser({ timeout: 30000 });
 
@@ -198,7 +200,7 @@ app.get('/api/news', async (req, res) => {
   });
   all.sort((a, b) => new Date(b.date) - new Date(a.date));
 
-  // Traduz titulos do Telecompaper (en -> pt-BR)
+  // Traduz titulos das fontes internacionais (en -> pt-BR)
   const toTranslate = all.filter(n => n.lang === 'en');
   await Promise.allSettled(
     toTranslate.map(async n => {
