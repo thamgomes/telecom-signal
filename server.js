@@ -165,7 +165,7 @@ async function translateMyMemory(text) {
   if (!text) return text;
   try {
     const encoded = encodeURIComponent(text.slice(0, 500));
-    const url = 'https://api.mymemory.translated.net/get?q=' + encoded + '&langpair=en|pt-BR';
+    const url = 'https://api.mymemory.translated.net/get?q=' + encoded + '&langpair=en|pt-BR&de=thaismachado.1979@gmail.com';
     const json = await fetchJson(url, { timeout: 8000 });
     const t = json && json.responseData && json.responseData.translatedText;
     return (t && t !== text) ? t : text;
@@ -181,7 +181,7 @@ app.get('/api/news', async (req, res) => {
   const results = await Promise.allSettled(
     RSS_FEEDS.map(f =>
       rssParser.parseURL(f.url).then(feed =>
-        (feed.items || []).slice(0, 30).map(item => ({
+        (feed.items || []).slice(0, f.lang === 'en' ? 15 : 30).map(item => ({
           title:  item.title?.trim(),
           link:   item.link,
           date:   item.pubDate || item.isoDate,
