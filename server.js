@@ -161,14 +161,21 @@ const RSS_FEEDS = [
 ];
 const rssParser = new RssParser({ timeout: 30000 });
 
-async function translateMyMemory(text) {
+const TRANS_CACHE = {};
+async function translateEN(text) {
   if (!text) return text;
+  if (TRANS_CACHE[text]) return TRANS_CACHE[text];
   try {
     const encoded = encodeURIComponent(text.slice(0, 500));
-    const url = 'https://api.mymemory.translated.net/get?q=' + encoded + '&langpair=en|pt-BR&de=thaismachado.1979@gmail.com';
+    const url = 'https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=pt-BR&dt=t&q=' + encoded;
     const json = await fetchJson(url, { timeout: 8000 });
-    const t = json && json.responseData && json.responseData.translatedText;
-    return (t && t !== text) ? t : text;
+    let result = '';
+    if (Array.isArray(json) && Array.isArray(json[0])) {
+      json[0].forEach(part => { if (part[0]) result += part[0]; });
+    }
+    const translated = result || text;
+    TRANS_CACHE[text] = translated;
+    return translated;
   } catch (e) {
     return text;
   }
@@ -204,7 +211,7 @@ app.get('/api/news', async (req, res) => {
   const toTranslate = all.filter(n => n.lang === 'en');
   await Promise.allSettled(
     toTranslate.map(async n => {
-      n.title = await translateMyMemory(n.title);
+      n.title = await translateEN(n.title);
     })
   );
 
