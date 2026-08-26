@@ -92,36 +92,18 @@ async function fetchYahooStock(sym) {
   };
 }
 
-async function fetchBrst3Fundamentus() {
-  const { text } = await fetchText('https://www.fundamentus.com.br/detalhes.php?papel=BRST3', {
-    insecure: true,
-    encoding: 'latin1',
-    headers: {
-      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
-      'Accept': 'text/html',
-      'Referer': 'https://www.fundamentus.com.br/resultado.php',
-    },
+async function fetchBrst3Brapi() {
+  const json = await fetchJson('https://brapi.dev/api/quote/BRST3?range=1d&interval=1d&fundamental=false', {
+    headers: { 'User-Agent': 'Mozilla/5.0', 'Accept': 'application/json' },
+    timeout: 15000,
   });
-
-  const spans = [...text.matchAll(/<span[^>]*>([\d]+[,.][\d]+)<\/span>/g)];
-  if (!spans.length) throw new Error('BRST3: nenhum span numerico no Fundamentus');
-
-  const price  = parseFloat(spans[0][1].replace(',', '.'));
-  const min52w = spans[1] ? parseFloat(spans[1][1].replace(',', '.')) : null;
-  const max52w = spans[2] ? parseFloat(spans[2][1].replace(',', '.')) : null;
-
-  const dateMatch = text.match(/Data\s+[uU]lt\s+cot[\s\S]{0,100}?(\d{2}\/\d{2}\/\d{4})/i);
-  const lastDate  = dateMatch ? dateMatch[1] : null;
-
-  if (!price || isNaN(price)) throw new Error('BRST3: preco invalido no Fundamentus');
-
+  const r = json?.results?.[0];
+  if (!r || !r.regularMarketPrice) throw new Error('BRST3: sem dados na brapi.dev');
   return {
     symbol:                     'BRST3',
-    regularMarketPrice:         price,
-    regularMarketChangePercent: 0,
-    regularMarketVolume:        0,
-    min52w, max52w, lastDate,
-    source: 'Fundamentus',
+    regularMarketPrice:         r.regularMarketPrice,
+    regularMarketChangePercent: r.regularMarketChangePercent ?? 0,
+    regularMarketVolume:        r.regularMarketVolume ?? 0,
     brisanet: true,
   };
 }
@@ -131,7 +113,7 @@ app.get('/api/b3', async (req, res) => {
   if (isFresh(cached)) return res.json(cached.data);
 
   const results = await Promise.allSettled([
-    fetchBrst3Fundamentus(),
+    fetchBrst3Brapi(),
     ...YAHOO_STOCKS.map(s => fetchYahooStock(s.sym)),
   ]);
 
@@ -140,7 +122,7 @@ app.get('/api/b3', async (req, res) => {
     if (r.status === 'fulfilled') {
       stocks.push(r.value);
     } else {
-      const name = i === 0 ? 'BRST3' : YAHOO_STOCKS[i - 1].display;
+      const name = i === 0 ? 'BRST3 (brapi)' : YAHOO_STOCKS[i - 1].display;
       console.warn('[B3] ' + name + ': ' + r.reason?.message);
     }
   });
