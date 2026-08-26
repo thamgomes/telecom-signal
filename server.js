@@ -67,6 +67,7 @@ async function fetchText(url, opts = {}) {
 
 // B3 - Yahoo Finance + Fundamentus (BRST3)
 const YAHOO_STOCKS = [
+  { sym:'BRST3.SA', name:'Brisanet',          display:'BRST3', color:'#F05424', brisanet:true },
   { sym:'VIVT3.SA', name:'Vivo (Telefonica)', display:'VIVT3', color:'#4A9AF5' },
   { sym:'TIMS3.SA', name:'TIM Brasil',        display:'TIMS3', color:'#4B6FD5' },
   { sym:'OIBR3.SA', name:'Oi',               display:'OIBR3', color:'#F5C518' },
@@ -132,18 +133,16 @@ app.get('/api/b3', async (req, res) => {
   const cached = getCache('b3');
   if (isFresh(cached)) return res.json(cached.data);
 
-  const results = await Promise.allSettled([
-    fetchBrst3(),
-    ...YAHOO_STOCKS.map(s => fetchYahooStock(s.sym)),
-  ]);
+  const results = await Promise.allSettled(
+    YAHOO_STOCKS.map(s => fetchYahooStock(s.sym).then(q => ({ ...q, brisanet: s.brisanet || false })))
+  );
 
   const stocks = [];
   results.forEach((r, i) => {
     if (r.status === 'fulfilled') {
       stocks.push(r.value);
     } else {
-      const name = i === 0 ? 'BRST3 (brapi)' : YAHOO_STOCKS[i - 1].display;
-      console.warn('[B3] ' + name + ': ' + r.reason?.message);
+      console.warn('[B3] ' + YAHOO_STOCKS[i].display + ': ' + r.reason?.message);
     }
   });
 
