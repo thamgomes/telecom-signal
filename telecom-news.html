@@ -59,7 +59,7 @@ a{color:inherit;text-decoration:none}
 
 /* Header */
 header{padding:28px 40px 22px;display:flex;align-items:flex-end;justify-content:space-between;border-bottom:1px solid var(--border);gap:20px;flex-wrap:wrap}
-.brand-name{font-family:'Syne',sans-serif;font-size:1.7rem;font-weight:800;letter-spacing:-.02em;color:#fff}
+.brand-name{font-family:'Syne',sans-serif;font-size:1.7rem;font-weight:800;letter-spacing:-.02em;color:var(--text)}
 .brand-name span{color:var(--cyan)}
 .brand-sub{font-size:.7rem;font-weight:500;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-top:4px}
 .live-badge{display:inline-flex;align-items:center;gap:6px;font-size:.68rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--green);padding:4px 10px;background:rgba(34,201,122,.1);border:1px solid rgba(34,201,122,.25);border-radius:20px}
@@ -122,7 +122,7 @@ header{padding:28px 40px 22px;display:flex;align-items:flex-end;justify-content:
 .b3-sym{font-family:'Syne',sans-serif;font-size:.78rem;font-weight:800;letter-spacing:.06em;color:var(--subtle);margin-bottom:4px}
 .b3-card.brisanet-card .b3-sym{color:var(--brisanet)}
 .b3-company{font-size:.7rem;color:var(--muted);margin-bottom:12px;font-weight:500}
-.b3-price{font-family:'Syne',sans-serif;font-size:1.5rem;font-weight:700;color:#fff;font-variant-numeric:tabular-nums;letter-spacing:-.02em;line-height:1;margin-bottom:6px}
+.b3-price{font-family:'Syne',sans-serif;font-size:1.5rem;font-weight:700;color:var(--text);font-variant-numeric:tabular-nums;letter-spacing:-.02em;line-height:1;margin-bottom:6px}
 .b3-change{display:inline-flex;align-items:center;gap:4px;font-size:.74rem;font-weight:600;font-variant-numeric:tabular-nums;padding:3px 8px;border-radius:4px}
 .b3-change.up{color:var(--green);background:rgba(34,201,122,.12)}
 .b3-change.dn{color:var(--red);background:rgba(240,79,79,.12)}
@@ -268,7 +268,7 @@ header{padding:28px 40px 22px;display:flex;align-items:flex-end;justify-content:
         in &nbsp;Brisanet Telecom
       </a>
       <div class="brisanet-ticker-inline">
-        <span style="font-size:1.05rem;font-family:'Syne',sans-serif;font-weight:700;color:#fff" id="brst3-price-header">&mdash;</span>
+        <span style="font-size:1.05rem;font-family:'Syne',sans-serif;font-weight:700;color:var(--text)" id="brst3-price-header">&mdash;</span>
         <span class="b3-change flat" id="brst3-chg-header">&mdash;</span>
       </div>
     </div>
@@ -299,7 +299,7 @@ header{padding:28px 40px 22px;display:flex;align-items:flex-end;justify-content:
     <!-- cabecalho fixo -->
     <div style="padding:18px 24px 14px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;border-bottom:1px solid rgba(240,84,36,.15)">
       <div>
-        <div style="font-family:'Syne',sans-serif;font-size:.95rem;font-weight:800;color:#fff">Trabalhe na Brisanet &mdash; Home Office</div>
+        <div style="font-family:'Syne',sans-serif;font-size:.95rem;font-weight:800;color:var(--text)">Trabalhe na Brisanet &mdash; Home Office</div>
         <div style="font-size:.67rem;color:var(--muted);margin-top:3px">
           Fonte: LinkedIn Jobs &middot; atualizado em <span id="vagasData">&mdash;</span>
         </div>
@@ -899,7 +899,7 @@ async function loadVagas(){
       <a href="${esc(v.link||'#')}" target="_blank" rel="noopener"
          style="display:block;background:var(--card);padding:18px 22px;cursor:pointer;transition:background .15s;text-decoration:none"
          onmouseover="this.style.background='rgba(240,84,36,.06)'" onmouseout="this.style.background='var(--card)'">
-        <div style="font-family:'Syne',sans-serif;font-size:.85rem;font-weight:700;color:#fff;margin-bottom:6px;line-height:1.3">${esc(v.titulo)}</div>
+        <div style="font-family:'Syne',sans-serif;font-size:.85rem;font-weight:700;color:var(--text);margin-bottom:6px;line-height:1.3">${esc(v.titulo)}</div>
         <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px">
           ${v.area    ? `<span style="font-size:.63rem;font-weight:700;padding:2px 8px;border-radius:4px;background:rgba(240,84,36,.15);color:var(--brisanet)">${esc(v.area)}</span>` : ''}
           ${v.modalidade ? `<span style="font-size:.63rem;font-weight:700;padding:2px 8px;border-radius:4px;background:rgba(0,200,224,.1);color:var(--cyan)">${esc(v.modalidade)}</span>` : ''}
