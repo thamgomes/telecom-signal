@@ -13,9 +13,9 @@
   --card:        #141826;
   --border:      #1E2740;
   --border-lite: #252E48;
-  --text:        #D8E2F5;
-  --muted:       #5A6A8A;
-  --subtle:      #8896B4;
+  --text:        #E8EEF8;
+  --muted:       #7A8AAA;
+  --subtle:      #A0AFCC;
   --cyan:        #00C8E0;
   --brisanet:    #F05424;
   --brisanet-dim:rgba(240,84,36,.12);
@@ -24,6 +24,22 @@
   --yellow:      #F5C518;
   --radius:      10px;
   --radius-sm:   6px;
+}
+[data-theme="light"] {
+  --bg:          #F0F4FA;
+  --surface:     #FFFFFF;
+  --card:        #FFFFFF;
+  --border:      #D0D8E8;
+  --border-lite: #C0CCDC;
+  --text:        #111827;
+  --muted:       #556070;
+  --subtle:      #374151;
+  --cyan:        #0088A8;
+  --brisanet:    #D04010;
+  --brisanet-dim:rgba(208,64,16,.1);
+  --green:       #1A9A5A;
+  --red:         #CC2222;
+  --yellow:      #C09000;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{font-size:15px;scroll-behavior:smooth}
@@ -225,6 +241,7 @@ header{padding:28px 40px 22px;display:flex;align-items:flex-end;justify-content:
       <span id="visitCounter" style="font-size:.65rem;font-weight:600;color:var(--muted);letter-spacing:.05em;display:none">
         &#128065; <span id="visitCount">...</span> acessos
       </span>
+      <button id="themeToggle" onclick="toggleTheme()" title="Alternar tema" style="background:var(--card);border:1px solid var(--border);color:var(--subtle);width:32px;height:32px;border-radius:8px;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;transition:border-color .2s,color .2s" onmouseover="this.style.borderColor='var(--cyan)';this.style.color='var(--cyan)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--subtle)'">🌙</button>
     </div>
     <span class="update-time" id="updateTime">Carregando...</span>
   </div>
@@ -912,6 +929,26 @@ async function refresh(){
     if (j && j.count) {
       document.getElementById('visitCount').textContent = j.count.toLocaleString('pt-BR');
       document.getElementById('visitCounter').style.display = 'inline-flex';
+    }
+  } catch(e) {}
+})();
+
+// ── Tema dark/light ───────────────────────────────────────
+function toggleTheme(){
+  const html = document.documentElement;
+  const isLight = html.getAttribute('data-theme') === 'light';
+  const next = isLight ? 'dark' : 'light';
+  html.setAttribute('data-theme', next);
+  document.getElementById('themeToggle').textContent = next === 'dark' ? '🌙' : '☀️';
+  try { localStorage.setItem('ts-theme', next); } catch(e) {}
+}
+(function initTheme(){
+  try {
+    const saved = localStorage.getItem('ts-theme');
+    if (saved) {
+      document.documentElement.setAttribute('data-theme', saved);
+      const btn = document.getElementById('themeToggle');
+      if (btn) btn.textContent = saved === 'dark' ? '🌙' : '☀️';
     }
   } catch(e) {}
 })();
