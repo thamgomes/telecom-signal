@@ -221,11 +221,13 @@ header{padding:28px 40px 22px;display:flex;align-items:flex-end;justify-content:
       <div class="ticker-item"><span class="sym">TIMS3</span><span class="price" id="t-TIMS3-p">&mdash;</span><span class="chg flat" id="t-TIMS3-c">&mdash;</span></div>
       <div class="ticker-item"><span class="sym">OIBR3</span><span class="price" id="t-OIBR3-p">&mdash;</span><span class="chg flat" id="t-OIBR3-c">&mdash;</span></div>
       <div class="ticker-item"><span class="sym">FIQE3</span><span class="price" id="t-FIQE3-p">&mdash;</span><span class="chg flat" id="t-FIQE3-c">&mdash;</span></div>
+      <div class="ticker-item"><span class="sym">ALGT3</span><span class="price" id="t-ALGT3-p">&mdash;</span><span class="chg flat" id="t-ALGT3-c">&mdash;</span></div>
       <div class="ticker-item"><span class="sym brisanet">BRST3</span><span class="price" id="t2-BRST3-p">&mdash;</span><span class="chg flat" id="t2-BRST3-c">&mdash;</span></div>
       <div class="ticker-item"><span class="sym">VIVT3</span><span class="price" id="t2-VIVT3-p">&mdash;</span><span class="chg flat" id="t2-VIVT3-c">&mdash;</span></div>
       <div class="ticker-item"><span class="sym">TIMS3</span><span class="price" id="t2-TIMS3-p">&mdash;</span><span class="chg flat" id="t2-TIMS3-c">&mdash;</span></div>
       <div class="ticker-item"><span class="sym">OIBR3</span><span class="price" id="t2-OIBR3-p">&mdash;</span><span class="chg flat" id="t2-OIBR3-c">&mdash;</span></div>
       <div class="ticker-item"><span class="sym">FIQE3</span><span class="price" id="t2-FIQE3-p">&mdash;</span><span class="chg flat" id="t2-FIQE3-c">&mdash;</span></div>
+      <div class="ticker-item"><span class="sym">ALGT3</span><span class="price" id="t2-ALGT3-p">&mdash;</span><span class="chg flat" id="t2-ALGT3-c">&mdash;</span></div>
     </div>
   </div>
 </div>
@@ -558,17 +560,20 @@ const STOCKS = [
   { sym:'VIVT3',  name:'Vivo/Telefonica', color:'#4A9AF5' },
   { sym:'TIMS3',  name:'TIM Brasil',      color:'#4B6FD5' },
   { sym:'OIBR3',  name:'Oi',             color:'#F5C518' },
-  { sym:'FIQE3', name:'Unifique', color:'#A47FE0' },
+  { sym:'FIQE3',  name:'Unifique',      color:'#A47FE0' },
+  { sym:'ALGT3',  name:'Algar Telecom', color:'#F5A623' },
 ];
 
 const OPERATORS = [
-  { name:'Vivo / Telefonica', keywords:['vivo','telefonica','vivt3'], color:'#4A9AF5' },
-  { name:'TIM Brasil',        keywords:['tim brasil','tim','tims3'],  color:'#4B6FD5' },
-  { name:'Claro',             keywords:['claro'],                     color:'#CC1E1E' },
-  { name:'Oi',                keywords:['oi','oibr'],                color:'#F5C518' },
-  { name:'Unifique',           keywords:['unifique'],                  color:'#A47FE0' },
-  { name:'Vero',               keywords:['vero internet','vero fibra','grupo vero'], color:'#5CC8FF' },
-  { name:'Anatel',             keywords:['anatel multa','anatel aprova','anatel proibe','anatel determina','anatel regulamenta','anatel leilao','anatel publica','anatel abre','anatel suspende','anatel notifica'],  color:'#48CFAD' },
+  { name:'Vivo / Telefonica', keywords:['vivo','telefonica','vivt3'],                 color:'#4A9AF5' },
+  { name:'TIM Brasil',        keywords:['tim brasil','tim','tims3'],                  color:'#4B6FD5' },
+  { name:'Claro',             keywords:['claro'],                                     color:'#CC1E1E' },
+  { name:'Oi',                keywords:['oi','oibr'],                                color:'#F5C518' },
+  { name:'Algar Telecom',     keywords:['algar telecom','algar','algt3'],             color:'#F5A623' },
+  { name:'Arqia',             keywords:['arqia','m2m conectividade'],                color:'#22C97A' },
+  { name:'Unifique',          keywords:['unifique'],                                  color:'#A47FE0' },
+  { name:'Vero',              keywords:['vero internet','vero fibra','grupo vero'],   color:'#5CC8FF' },
+  { name:'Anatel',            keywords:['anatel multa','anatel aprova','anatel proibe','anatel determina','anatel regulamenta','anatel leilao','anatel publica','anatel abre','anatel suspende','anatel notifica'], color:'#48CFAD' },
 ];
 
 // ── Helpers ───────────────────────────────────────────────
@@ -657,16 +662,18 @@ const BRST_KW = ['brisanet','brst3','roberto nogueira','nogueira brisanet'];
 
 async function loadAllNews(){
   try{
-    const [newsData, manualData, brRssData, febRssData] = await Promise.all([
+    const [newsData, manualData, brRssData, febRssData, iotRssData] = await Promise.all([
       fetch(PROXY+'/news',{signal:AbortSignal.timeout(45000)}).then(r=>r.json()).catch(()=>({items:[]})),
       fetch(PROXY+'/noticias-brisanet',{signal:AbortSignal.timeout(5000)}).then(r=>r.json()).catch(()=>({items:[]})),
       fetch(PROXY+'/news-brisanet-rss',{signal:AbortSignal.timeout(15000)}).then(r=>r.json()).catch(()=>({items:[]})),
       fetch(PROXY+'/news-febraban-rss',{signal:AbortSignal.timeout(15000)}).then(r=>r.json()).catch(()=>({items:[]})),
+      fetch(PROXY+'/news-iot-rss',{signal:AbortSignal.timeout(15000)}).then(r=>r.json()).catch(()=>({items:[]})),
     ]);
     const all    = newsData.items||[];
     const manual = manualData.items||[];
     const brRss  = brRssData.items||[];
     const febRss = (febRssData.items||[]).map(n=>({...n, source:'Febraban Tech · '+n.source, color:'#22C97A'}));
+    const iotRss = (iotRssData.items||[]).map(n=>({...n, source:'IoT · '+n.source, color:'#48CFAD'}));
 
     // Palavras-chave de todas as operadoras (para deduplicar secoes)
     const ALL_OP_KW = OPERATORS.flatMap(o=>o.keywords);
@@ -681,7 +688,7 @@ async function loadAllNews(){
     const opNews  = all.filter(n=>!has(n.title+' '+(n.link||''), BRST_KW));
 
     renderBrisanetNews(manual, [...brNews, ...brRss], all);
-    renderSectorNews([...secNews, ...febRss]);
+    renderSectorNews([...secNews, ...febRss, ...iotRss]);
     renderOperators(opNews);
     // Traduz titulos em ingles no browser
     document.querySelectorAll('[data-entitle]').forEach(el=>{

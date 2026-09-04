@@ -71,7 +71,8 @@ const YAHOO_STOCKS = [
   { sym:'VIVT3.SA', name:'Vivo (Telefonica)', display:'VIVT3', color:'#4A9AF5' },
   { sym:'TIMS3.SA', name:'TIM Brasil',        display:'TIMS3', color:'#4B6FD5' },
   { sym:'OIBR3.SA', name:'Oi',               display:'OIBR3', color:'#F5C518' },
-  { sym:'FIQE3.SA', name:'Unifique', display:'FIQE3', color:'#A47FE0' },
+  { sym:'FIQE3.SA',  name:'Unifique',      display:'FIQE3',  color:'#A47FE0' },
+  { sym:'ALGT3.SA',  name:'Algar Telecom', display:'ALGT3',  color:'#F5A623' },
 ];
 
 async function fetchYahooStock(sym) {
@@ -129,6 +130,7 @@ const RSS_FEEDS = [
 
 const BRISANET_RSS_URL  = 'https://news.google.com/rss/search?q=brisanet&hl=pt-BR&gl=BR&ceid=BR:pt-419';
 const FEBRABAN_RSS_URL  = 'https://news.google.com/rss/search?q=Febraban+Tech+5G+OR+IoT&hl=pt-BR&gl=BR&ceid=BR:pt-419';
+const IOT_RSS_URL       = 'https://news.google.com/rss/search?q=IoT+Brasil+OR+"internet+das+coisas"+OR+M2M+telecom&hl=pt-BR&gl=BR&ceid=BR:pt-419';
 
 app.get('/api/news-brisanet-rss', async (req, res) => {
   const cached = getCache('news-brisanet-rss');
@@ -149,6 +151,26 @@ app.get('/api/news-brisanet-rss', async (req, res) => {
     res.json({ items: [] });
   }
 });
+app.get('/api/news-iot-rss', async (req, res) => {
+  const cached = getCache('news-iot-rss');
+  if (isFresh(cached)) return res.json(cached.data);
+  try {
+    const feed = await rssParser.parseURL(IOT_RSS_URL);
+    const items = (feed.items || []).slice(0, 15).map(item => ({
+      title:  item.title?.trim(),
+      link:   item.link,
+      date:   item.pubDate || item.isoDate,
+      source: item.source?.title || 'Google News',
+    }));
+    const data = { items, fetchedAt: new Date().toISOString() };
+    setCache('news-iot-rss', data, 30 * 60 * 1000);
+    res.json(data);
+  } catch(e) {
+    console.warn('[IoTRSS] ' + e.message);
+    res.json({ items: [] });
+  }
+});
+
 app.get('/api/news-febraban-rss', async (req, res) => {
   const cached = getCache('news-febraban-rss');
   if (isFresh(cached)) return res.json(cached.data);
